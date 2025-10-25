@@ -1,8 +1,9 @@
 import React from 'react';
-import logo from '../../../../src/assets/Banorte.png';
+import logo from '../../../assets/Logo.png';
 import '../../Pure/LogIn/LogIn.css';
+import {Link} from 'react-router-dom';
 
-const logIn = () => {
+const LogIn = () => {
     return (
         <div className='logIn-screen'>
             <div className='logIn-Box'>
@@ -11,11 +12,11 @@ const logIn = () => {
                 <form className='login-form'>
                     <input type='text' placeholder='Usuario' className='logIn-input'/>
                     <input type='text' placeholder='Contraseña' className='logIn-input'/>
-                    <button type='submit' className='logIn-button'>Ingresar</button>
+                    <Link to='/Dashboard'><button type='button' className='logIn-button'>Ingresar</button></Link>
                 </form>
             </div>
         </div>
     );
 }
 
-export default logIn;
+export default LogIn;
