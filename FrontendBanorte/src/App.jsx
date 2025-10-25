@@ -1,7 +1,9 @@
+
 // src/App.jsx
 
 import { useState } from 'react' 
 import './App.css' // <-- Este CSS ahora solo tendría los layouts y estilos globales
+
 
 // 1. Importas tus nuevas vistas
 import MainView from './views/MainView';
@@ -9,6 +11,7 @@ import UploadView from './views/UploadView';
 
 // 4. NUEVA FUNCIÓN 'App' (Controlador)
 function App() {
+
   const [view, setView] = useState('main'); // Estado: 'main' o 'upload'
 
   return (
@@ -21,6 +24,7 @@ function App() {
       ) : (
         <UploadView setView={setView} />
       )}
+
     </div>
   )
 }

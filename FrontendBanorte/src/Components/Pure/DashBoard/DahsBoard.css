@@ -1,14 +1,16 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
   
   display: flex;
   flex-direction: column;
   flex: 1; 
-  justify-content: space-between;
+  justify-content: center;
   box-sizing: border-box; 
+  min-height: 100vh;
+  margin-top: 2.5rem;
 }
 
 h1 {
@@ -18,7 +20,8 @@ h1 {
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); 
   line-height: 1.1;
-  margin-bottom: 0; 
+  margin-bottom: 3rem;
+  margin-top: 0;
   align-content: center;
 }
 
@@ -75,10 +78,10 @@ h1 {
   padding: 0.5em 0.6em;   /* Reducido (antes 0.7em 1.2em) */
   font-size: 0.9em;   /* Reducido (antes 1em) */
   /* --- FIN DEL CAMBIO --- */
-  
+  margin-top: 8.5rem;
+  margin-bottom: 0;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 0; 
   transition: background-color 0.25s ease, transform 0.25s ease;
 }
 
