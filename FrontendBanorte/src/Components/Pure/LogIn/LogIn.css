@@ -1,0 +1,73 @@
+body, html, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.logIn-screen{
+    width: 100vw;
+    height: 100vh;
+    background-color: #EB0019; 
+  
+  /* Un degradado radial (circular) que empieza 
+    en el 80% del alto (casi abajo) y 
+    va de un rojo brillante a un rojo oscuro.
+  */
+  background: linear-gradient(to bottom, #C00 0%, #FFFFFF 100%);
+  background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logIn-Box{
+    background-color: white;
+    padding: 40px 30px;
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 320px;
+}
+
+.logo{
+    width: 200px;
+    margin-bottom: 20px;
+}
+
+.logIn-Box h2{
+    font-size: 25px;
+    color: #000000;
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.logIn-form{
+    width: 100%;
+}
+
+.logIn-input{
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+    color: #000000;
+}
+
+.logIn-button{
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #EB0019;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
