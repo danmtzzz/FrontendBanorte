@@ -96,8 +96,10 @@
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  background-color: #EB0019; /* Color rojo Banorte */
   color: white;
+  position: relative; /* ¡MUY IMPORTANTE! */
+  overflow: hidden;   /* Para que la barra no se salga */
+  background-color: #EB0019; /* Color de fondo base */
   transition: background-color 0.2s, transform 0.2s;
 }
 
@@ -109,6 +111,7 @@
 /* Estilo del botón Aceptar cuando está deshabilitado */
 .btnAccept:disabled {
   background-color: #ced4da; /* Gris */
+  color: #6c757d;
   cursor: not-allowed;
   transform: none;
 }
@@ -202,4 +205,50 @@
   color: #28a745; /* Verde para éxito */
   text-align: center;
   font-weight: 500;
+}
+
+/* --- AGREGA ESTA CLASE a UploadView.module.css --- */
+
+/* Estilo para el contenedor del JSON */
+.jsonViewer {
+  width: 100%;
+  max-height: 400px; /* Le damos una altura máxima */
+  overflow-y: auto; /* Scroll vertical si el JSON es muy largo */
+  background-color: #f8f9fa; /* Fondo claro */
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left; /* Alineamos el texto a la izquierda */
+  box-sizing: border-box;
+}
+
+/* Estilo para el tag <pre> dentro del visor */
+.jsonViewer pre {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace; /* Fuente monoespaciada */
+  font-size: 0.9em;
+  color: #212529;
+}
+
+/* La barra de progreso (el relleno) */
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%; /* Inicia en 0% */
+  background-color: #c90016; /* Rojo más oscuro que el fondo */
+  transition: width 0.1s linear; /* Animación suave */
+  z-index: 1; /* Se pone detrás del texto */
+}
+
+/* El texto del botón */
+.progressText {
+  position: relative; /* Se pone encima de la barra */
+  z-index: 2;
+  /* El color se hereda del .btnAccept (blanco) */
+  /* o de .btnAccept:disabled (gris oscuro) */
+  /* ¡Así que no necesita color propio! */
 }

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import styles from './UploadView.module.css'; // Importa el CSS Módulo
-import axios from 'axios'; // <-- ¡NUEVO! Importamos axios
+import React, { useState, useRef, useEffect } from 'react';
+import styles from './UploadView.module.css'; 
+import axios from 'axios';
 
-// --- Ícono SVG (de tu código) ---
+// --- (El ícono SVG se queda igual) ---
 const UploadIcon = () => (
   <svg 
     className={styles.uploadIcon}
     xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
+    viewBox="0 0 24" 
     fill="none" 
     stroke="currentColor" 
     strokeWidth="2" 
@@ -25,77 +25,86 @@ const UploadIcon = () => (
 function UploadView({ setView }) {
   
   // --- ESTADOS ---
-  // 1. Cambiamos 'fileName' por 'selectedFile' para guardar el objeto File
   const [selectedFile, setSelectedFile] = useState(null); 
-  const [isDragging, setIsDragging] = useState(false); // (de tu código)
-  
-  // 2. ¡NUEVOS ESTADOS! (de la lógica anterior)
+  const [isDragging, setIsDragging] = useState(false);
   const [userType, setUserType] = useState('personal');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null); // Para mensajes de éxito sin 'alert'
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // --- REFS ---
+  // Usamos un ref para el ID del timeout
+  const timeoutRef = useRef(null);
+  // Y un ref para saber si la simulación debe seguir corriendo
+  // Esto es para que los timeouts "viejos" no actualicen el estado
+  // si la carga ya terminó (por éxito o error).
+  const isStillLoadingRef = useRef(false);
+
+  // --- Limpieza ---
+  // Limpia cualquier timeout pendiente si el componente se desmonta
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      isStillLoadingRef.current = false;
+    };
+  }, []); // El [] vacío = se ejecuta al montar y desmontar
 
 
-  // --- Lógica de Manejo de Archivos ---
-
-  // 3. ¡LÓGICA ACTUALIZADA!
-  // Esta función centraliza la validación y guardado del *archivo*
+  // --- (Handlers de archivo, drag/drop, etc. se quedan igual) ---
   const handleFile = (file) => {
+    if (analysisResult) setAnalysisResult(null);
     if (file && (file.type === "application/vnd.ms-excel" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
-      setSelectedFile(file); // <-- Guarda el objeto File
-      setError(null);      // Limpia errores
-      setSuccess(null);    // Limpia éxito
+      setSelectedFile(file); 
+      setError(null);
+      setUploadProgress(0); 
     } else {
-      setSelectedFile(null); // Limpia el archivo
+      setSelectedFile(null); 
       if (file) {
-        // Usamos el estado de error, no un 'alert'
         setError("Por favor, selecciona solo archivos .xls o .xlsx");
       }
     }
   };
-
-  // 4. (de tu código) Manejador para el <input type="file">
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
       handleFile(event.target.files[0]);
     }
   };
-
-  // 5. (de tu código) Manejadores de Drag-and-Drop
   const handleDragOver = (event) => {
     event.preventDefault(); 
-    if (!loading) setIsDragging(true); // Solo si no está cargando
+    if (!loading) setIsDragging(true);
   };
-
   const handleDragLeave = (event) => {
     event.preventDefault();
     setIsDragging(false);
   };
-
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
-    if (loading) return; // No hacer nada si está cargando
-
+    if (loading) return; 
     if (event.dataTransfer.files.length > 0) {
       handleFile(event.dataTransfer.files[0]);
       event.dataTransfer.clearData();
     }
   };
-
-  // 6. ¡NUEVO! Manejador para el selector de tipo
   const handleTypeChange = (event) => {
     setUserType(event.target.value);
   };
-
-  // 7. ¡NUEVO! Manejador para el botón "Regresar"
-  const handleReturn = () => {
-    if (!loading) {
-      setView('main');
-    }
+  const handleReturnToMain = () => {
+    if (loading) return; 
+    setView('main');
+  };
+  const handleResetUploader = () => {
+    setAnalysisResult(null);
+    setSelectedFile(null);
+    setError(null);
+    setUploadProgress(0); 
   };
 
-  // 8. ¡NUEVA LÓGICA! Para el botón "Aceptar y Analizar"
+
+  // --- ¡NUEVA LÓGICA DE SUBIDA CON SIMULACIÓN ALEATORIA! ---
   const handleAccept = async () => {
     if (!selectedFile) {
         setError('Por favor, selecciona un archivo primero.');
@@ -104,42 +113,113 @@ function UploadView({ setView }) {
 
     setLoading(true);
     setError(null);
-    setSuccess(null);
+    setAnalysisResult(null);
+    setUploadProgress(0); 
+    isStillLoadingRef.current = true; // <-- Marcamos que la carga inició
+
+    // Limpiamos cualquier timeout viejo
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    // --- Inicia la SIMULACIÓN de progreso ---
+    // Esta función se llamará a sí misma en cadena
+    const simulateProgress = () => {
+      // Si la carga terminó (por éxito o error), detenemos la simulación
+      if (!isStillLoadingRef.current) return;
+
+      // Calculamos un salto aleatorio (ej. entre 1% y 15%)
+      const randomIncrement = Math.random() * 10 + 1;
+      // Calculamos un tiempo de espera aleatorio (ej. entre 500ms y 2s)
+      const randomDelay = Math.random() * 2000 + 1000;
+
+      setUploadProgress(prev => {
+        let newProgress = prev + randomIncrement;
+        
+        if (newProgress >= 98) {
+          // Si llegamos a 98%, nos "atoramos" ahí y dejamos de simular
+          return 98; 
+        } else {
+          // Si no, programamos el siguiente salto
+          timeoutRef.current = setTimeout(simulateProgress, randomDelay);
+          return newProgress;
+        }
+      });
+    };
+
+    // --- Arrancamos la simulación ---
+    // Damos un pequeño salto inicial para que se vea que empezó
+    setUploadProgress(1); 
+    // Programamos el primer salto aleatorio
+    timeoutRef.current = setTimeout(simulateProgress, 500 + Math.random() * 1000); // Espera inicial
     
+    // --- Petición REAL a la API (mientras la simulación corre) ---
     const formData = new FormData();
     formData.append('file', selectedFile);
-
-    // Ajusta esta URL a tu endpoint de FastAPI
     const backendUrl = `http://127.0.0.1:8000/upload/?tipo_usuario=${userType}`;
+    const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
     try {
-        const response = await axios.post(backendUrl, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-        console.log('Respuesta del backend:', response.data);
-        setSuccess('¡Archivo subido con éxito! Listo para analizar.');
-        setSelectedFile(null); // Limpia el archivo después de subirlo
+        const response = await axios.post(backendUrl, formData, config);
         
-        // Futuro paso: setView('dashboard');
+        // --- ¡ÉXITO! ---
+        isStillLoadingRef.current = false; // <-- Detenemos la simulación
+        clearTimeout(timeoutRef.current);  // Matamos el último timeout
+        setUploadProgress(100); // Saltamos a 100%
+
+        setTimeout(() => { // Pausa para que se vea el 100%
+          console.log('Respuesta del backend:', response.data);
+          setAnalysisResult(response.data); 
+          setLoading(false); 
+          setSelectedFile(null); 
+        }, 300);
 
     } catch (err) {
+        // --- ¡ERROR! ---
+        isStillLoadingRef.current = false; // <-- Detenemos la simulación
+        clearTimeout(timeoutRef.current);  // Matamos el último timeout
         console.error('Error al subir el archivo:', err);
         setError('Hubo un error al subir el archivo. Revisa la consola.');
-    } finally {
-        setLoading(false);
+        setLoading(false); 
+        setUploadProgress(0); // Reseteamos la barra
     }
   };
 
 
-  // --- RENDERIZADO ---
+  // --- RENDERIZADO (El JSX no cambia nada) ---
+
+  // 1. VISTA DE RESULTADO (JSON)
+  if (analysisResult) {
+    return (
+      <div className={styles.uploadViewContainer}>
+        <button className={styles.backButton} onClick={handleReturnToMain}>
+          &larr; Volver al Dashboard
+        </button>
+        
+        <h2>Análisis Completado</h2>
+        <p>Este es el JSON que regresó tu API. ¡Listo para las gráficas!</p>
+
+        <div className={styles.jsonViewer}>
+          <pre>{JSON.stringify(analysisResult, null, 2)}</pre>
+        </div>
+
+        <div className={styles.buttonGroup}>
+          <button 
+              className={styles.btnAccept}
+              onClick={handleResetUploader}
+          >
+              Analizar otro archivo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. VISTA DE CARGA (Normal)
   return (
     <div className={styles.uploadViewContainer}>
-      {/* Botón Volver (actualizado con el nuevo handler) */}
       <button 
         className={styles.backButton} 
-        onClick={handleReturn} // <-- Usa el handler
-        disabled={loading} // <-- Deshabilitado si carga
+        onClick={handleReturnToMain}
+        disabled={loading} 
       >
         &larr; Volver al Dashboard
       </button>
@@ -147,7 +227,7 @@ function UploadView({ setView }) {
       <h2>Cargar archivo de Excel</h2>
       <p>Arrastra tu archivo .xls o .xlsx aquí para analizarlo.</p>
       
-      {/* --- ¡NUEVO! Selector de Tipo de Cuenta --- */}
+      {/* Selector de Tipo de Cuenta */}
       <div className={styles.optionGroup}>
           <label htmlFor="user-type-select">Tipo de Cuenta:</label>
           <select 
@@ -161,9 +241,8 @@ function UploadView({ setView }) {
           </select>
       </div>
 
-      {/* --- Zona de "Drag and Drop" (actualizada) --- */}
+      {/* Zona de "Drag and Drop" */}
       <div 
-        // Clases dinámicas: aplica 'dragOver' o 'disabledLabel' (si está cargando)
         className={`
           ${styles.dropZone} 
           ${isDragging ? styles.dragOver : ''}
@@ -179,17 +258,13 @@ function UploadView({ setView }) {
           className={styles.fileInputHidden} 
           accept=".xlsx, .xls"
           onChange={handleFileChange}
-          disabled={loading} // <-- Deshabilitado si carga
+          disabled={loading}
         />
         
         <UploadIcon /> 
-        
-        <p className={styles.uploadText}>
-          Arrastra y suelta tu archivo aquí
-        </p>
+        <p className={styles.uploadText}>Arrastra y suelta tu archivo aquí</p>
         <p className={styles.uploadSubtext}>o</p>
 
-        {/* El label también se deshabilita visualmente */}
         <label 
           htmlFor="file-upload" 
           className={`
@@ -202,30 +277,36 @@ function UploadView({ setView }) {
       </div>
       {/* --- FIN de la Zona --- */}
 
-      {/* --- ¡NUEVO! Mensajes de Estado --- */}
+      {/* Mensajes de Estado (Error) */}
       {error && (
         <p className={styles.errorInfo}>{error}</p>
       )}
-      {success && (
-        <p className={styles.successInfo}>{success}</p>
-      )}
 
-      {/* Actualizado para usar 'selectedFile' */}
+      {/* Nombre del archivo */}
       {selectedFile && !error && (
         <p className={styles.fileNameDisplay}>
           Archivo seleccionado: <strong>{selectedFile.name}</strong>
         </p>
       )}
 
-      {/* --- ¡NUEVO! Botón de Aceptar --- */}
+      {/* Botón de Aceptar (No hay que cambiar nada aquí) */}
       <div className={styles.buttonGroup}>
           <button 
-              className={styles.btnAccept} 
+              className={styles.btnAccept}
               onClick={handleAccept}
-              // Deshabilitado si no hay archivo O si está cargando
               disabled={!selectedFile || loading}
           >
-              {loading ? 'Cargando...' : 'Aceptar y Analizar'}
+            {loading && (
+              <div 
+                className={styles.progressBar}
+                style={{ width: `${uploadProgress}%` }} 
+              />
+            )}
+            <span className={styles.progressText}>
+              {loading 
+                ? `Procesando... ${Math.round(uploadProgress)}%` // Redondeamos para que no muestre decimales
+                : 'Aceptar y Analizar'}
+            </span>
           </button>
       </div>
     </div>
@@ -233,4 +314,3 @@ function UploadView({ setView }) {
 }
 
 export default UploadView;
-
