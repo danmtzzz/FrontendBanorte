@@ -1,7 +1,7 @@
 // src/views/UploadView.jsx
-
 import React, { useState } from 'react';
-// (Aquí importarías: import styles from './UploadView.module.css')
+// Importa el CSS Módulo
+import styles from './UploadView.module.css';
 
 function UploadView({ setView }) {
   const [fileName, setFileName] = useState('');
@@ -15,9 +15,10 @@ function UploadView({ setView }) {
   };
 
   return (
-    <div className="upload-view-container">
-      <button className="back-button" onClick={() => setView('main')}>
-        &larr; Volver
+    // Usa los nombres de clase del módulo
+    <div className={styles.uploadViewContainer}>
+      <button className={styles.backButton} onClick={() => setView('main')}>
+        &larr; Volver al Dashboard
       </button>
       
       <h2>Cargar archivo de Excel</h2>
@@ -26,16 +27,17 @@ function UploadView({ setView }) {
       <input 
         type="file" 
         id="file-upload" 
-        className="file-input-hidden" 
+        className={styles.fileInputHidden} 
         accept=".xlsx, .xls"
         onChange={handleFileChange}
       />
-      <label htmlFor="file-upload" className="file-upload-label">
+      {/* El label ahora es el botón principal */}
+      <label htmlFor="file-upload" className={styles.fileUploadLabel}>
         Seleccionar Archivo
       </label>
       
       {fileName && (
-        <p className="file-name-display">
+        <p className={styles.fileNameDisplay}>
           Archivo seleccionado: <strong>{fileName}</strong>
         </p>
       )}

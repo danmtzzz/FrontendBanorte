@@ -1,32 +1,39 @@
-
 // src/App.jsx
+import { useState } from 'react';
+import './App.css'; // <-- Este CSS ahora sí lo usaremos
 
-import { useState } from 'react' 
-import './App.css' // <-- Este CSS ahora solo tendría los layouts y estilos globales
-
-
-// 1. Importas tus nuevas vistas
+// 1. Importas todas tus vistas
+import LogIn from './Components/Pure/LogIn/LogIn';
 import MainView from './views/MainView';
 import UploadView from './views/UploadView';
 
-// 4. NUEVA FUNCIÓN 'App' (Controlador)
 function App() {
+  // Estado: 'login', 'main', o 'upload'
+  const [view, setView] = useState('login'); 
 
-  const [view, setView] = useState('main'); // Estado: 'main' o 'upload'
+  // Esta función decide qué vista mostrar
+  const renderView = () => {
+    switch (view) {
+      case 'main':
+        return <MainView setView={setView} />;
+      case 'upload':
+        return <UploadView setView={setView} />;
+      case 'login':
+      default:
+        // Pasamos setView al Login para que pueda cambiar de vista
+        return <LogIn setView={setView} />;
+    }
+  };
+
+  // Esta clase en el 'div' principal nos permite
+  // cambiar el fondo si es el login o la app principal
+  const layoutClass = view === 'login' ? 'login-layout' : 'app-layout';
 
   return (
-    // Esta clase aplica el layout correcto (de App.css)
-    <div className={view === 'main' ? 'main-view-layout' : 'upload-view-layout'}>
-      
-      {/* Lógica para mostrar una vista o la otra */}
-      {view === 'main' ? (
-        <MainView setView={setView} />
-      ) : (
-        <UploadView setView={setView} />
-      )}
-
+    <div className={`app-container ${layoutClass}`}>
+      {renderView()}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
