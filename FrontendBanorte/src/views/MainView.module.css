@@ -1,0 +1,105 @@
+/* src/views/MainView.module.css */
+
+.mainContainer {
+  width: 100%;
+  max-width: 1140px; /* Ancho máximo del contenido */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  color: #212529;
+  font-family: 'Century Gothic', 'Apple Gothic', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 3em;
+  font-weight: bold;
+  margin-bottom: 2.5rem;
+  margin-top: 0;
+  text-align: center;
+}
+
+.cardsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap; 
+  align-items: stretch;
+  width: 100%;
+}
+
+.card {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 2em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #DEE2E6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  
+  flex-basis: 300px; /* Base de 300px en escritorio */
+  flex-grow: 1;
+  max-width: 340px;
+  
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 5px 10px #EB0019;
+}
+
+.card img {
+  height: 4.5em;
+  margin-bottom: 1.5rem;
+}
+
+.card p {
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.ctaButton {
+  background-color: #EB0019;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1.5em;
+  font-size: 1.1em;
+  margin-top: 3.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.ctaButton:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(235, 0, 25, 0.25);
+}
+
+/* Media Query para teléfonos */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.2em;
+    margin-bottom: 2rem;
+  }
+  
+  .cardsContainer {
+    gap: 1.5rem;
+  }
+
+  .card {
+    /* En móvil, la tarjeta ocupa todo el ancho */
+    flex-basis: 100%;
+  }
+
+  .ctaButton {
+    width: 100%;
+    font-size: 1em;
+    padding: 0.9em;
+  }
+}

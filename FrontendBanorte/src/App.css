@@ -1,0 +1,22 @@
+/* src/App.css */
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box; /* Asegura que el padding no cause desbordamiento */
+  transition: background-color 0.3s ease;
+}
+
+/* Fondo gris claro para el Dashboard y la Carga */
+.app-layout {
+  background-color: #F8F9FA;
+}
+
+/* Fondo blanco y limpio para el Login */
+.login-layout {
+  background-color: #FFFFFF;
+}

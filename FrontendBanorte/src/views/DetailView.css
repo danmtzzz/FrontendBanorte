@@ -1,0 +1,575 @@
+/* --- ESTILOS ESPECÍFICOS PARA DETAILVIEW --- */
+
+/* Estilo base del botón "Volver" */
+.back-button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #FFFFFF; /* Color por defecto (para fondo oscuro) */
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.25s;
+  margin-bottom: 1em;
+}
+.back-button:hover {
+  opacity: 1;
+}
+
+/* Contenedor principal de la vista de detalle */
+.detail-view-container.vertical-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* Asegura altura mínima y permite crecimiento flex */
+  min-height: calc(100vh - 4rem); /* Altura ventana menos padding */
+  text-align: left;
+  padding: 2rem;
+  box-sizing: border-box;
+  position: relative; /* Contexto para chat */
+}
+
+/* Encabezado */
+.detail-header {
+  width: 100%;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+  display: flex;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  align-items: center;
+  flex-shrink: 0; /* No se encoge */
+}
+
+.detail-header h2 {
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #EB0019; /* Rojo Banorte */
+}
+
+/* Botón "Volver" en modo claro */
+.back-button.dark-text {
+  color: #4a4a4a;
+  opacity: 0.7;
+  align-self: center;
+  margin-bottom: 0;
+}
+.back-button.dark-text:hover {
+  color: #000000;
+  opacity: 1;
+}
+
+/* --- ESTILOS PARA LA SECCIÓN DE SIMULACIÓN --- */
+
+.simulation-controls {
+  background-color: #f8f9fa; /* Fondo gris claro */
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0; /* No se encoge */
+}
+
+.simulation-controls h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #004a99; /* Azul Banorte */
+  font-size: 1.4rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* Para ajuste en pantallas pequeñas */
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-group label {
+  font-weight: 500;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.control-group input[type="number"] {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  width: 80px;
+}
+
+.run-simulation-btn {
+  background-color: #28a745; /* Verde */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  margin-left: auto; /* Empuja a la derecha */
+}
+
+.run-simulation-btn:hover:not(:disabled) {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.run-simulation-btn:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* Formulario para añadir cambios */
+.add-change-form {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.add-change-form h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.form-row select,
+.form-row input {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px; /* Limita el ancho máximo para mejor distribución */
+}
+
+.add-change-form select,
+.add-change-form input[type="number"] {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.add-change-form input[type="number"] {
+   min-width: 100px;
+}
+
+
+.add-change-btn {
+  background-color: #004a99; /* Azul */
+  color: white;
+  border: none;
+  border-radius: 50%; /* Círculo */
+  width: 30px;
+  height: 30px;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.add-change-btn:hover {
+  background-color: #003a7a;
+}
+
+/* Lista de cambios añadidos */
+.changes-list {
+  margin-top: 1.5rem;
+}
+
+.changes-list h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+.changes-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.changes-list li {
+  background-color: #e9ecef;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+}
+.changes-list li:last-child {
+  margin-bottom: 0;
+}
+
+
+.remove-change-btn {
+  background: none;
+  border: none;
+  color: #dc3545; /* Rojo */
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 0.3rem;
+  line-height: 1;
+}
+.remove-change-btn:hover {
+  color: #a71d2a;
+}
+
+.no-changes-text,
+.no-simulation-text {
+  font-style: italic;
+  color: #6c757d;
+  font-size: 0.9em;
+  margin: 0.5rem 0;
+  text-align: center;
+  padding: 1rem 0;
+}
+.no-simulation-text {
+    padding: 4rem 0;
+}
+
+
+.simulation-error-text {
+    color: #721c24; /* Rojo oscuro */
+    background-color: #f8d7da; /* Rojo claro */
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* --- ESTILOS PARA EL MENÚ DE GRÁFICAS Y GRÁFICAS --- */
+.graph-menu {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  margin-top: 1rem;
+  flex-shrink: 0; /* No se encogen */
+}
+.graph-menu button {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0.5em 1em;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s ease;
+}
+.graph-menu button:hover {
+  background-color: #f9f9f9;
+}
+.graph-menu button.active {
+  color: #EB0019; /* Rojo Banorte */
+  border-bottom-color: #EB0019;
+  font-weight: 600;
+}
+.graph-menu button:disabled {
+    color: #adb5bd;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+
+/* Área de Gráfica - CON CORRECCIONES */
+.graph-content-area-middle {
+  /* No usamos flex: 1; damos tamaño explícito */
+  min-height: 350px;
+  height: 45vh; /* Porcentaje de altura de ventana */
+  max-height: 500px; /* Máximo */
+  width: 100%; /* Ancho completo */
+
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin-top: 1rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: #888;
+  box-sizing: border-box; /* Padding incluido en tamaño */
+}
+
+
+/* --- ESTILOS PARA EL CHAT FLOTANTE --- */
+
+.chat-panel-bottom {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 380px;
+  max-width: 90vw;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: transform 0.3s ease-out;
+}
+
+/* Cabecera del chat */
+.chat-header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 8px 8px 0 0;
+}
+.chat-header-bottom h3 {
+  margin: 0;
+  font-size: 1.1em;
+  color: #333;
+}
+.toggle-chat-btn {
+  background: none;
+  border: none;
+  font-size: 1.1em;
+  cursor: pointer;
+  color: #555;
+  padding: 0.2em 0.5em;
+}
+
+/* Contenido del chat */
+.chat-content-bottom {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, visibility 0s linear 0.4s;
+  visibility: visible;
+  padding: 0;
+}
+
+/* ESTADO MINIMIZADO */
+.chat-panel-bottom.minimized .chat-content-bottom {
+  max-height: 0;
+  visibility: hidden;
+  padding: 0;
+  transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, visibility 0s linear 0.4s;
+}
+
+/* Área de Mensajes */
+.chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #fff;
+  min-height: 100px;
+}
+.message {
+  padding: 0.6rem 0.9rem;
+  border-radius: 15px;
+  max-width: 85%;
+  font-size: 0.9em;
+  line-height: 1.45;
+  word-wrap: break-word;
+}
+.message.bot {
+  background-color: #e9ecef;
+  color: #212529;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+.message.user {
+  background-color: #EB0019;
+  color: #FFFFFF;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+/* Indicador de "Pensando..." */
+.message.bot.typing-indicator {
+  font-style: italic;
+  color: #555;
+  background-color: #f0f0f0;
+  align-self: flex-start;
+  animation: typing 1.2s infinite ease-in-out;
+}
+@keyframes typing {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+
+/* Área de Input del Chat */
+.chat-input-area {
+  display: flex;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  border-radius: 0 0 8px 8px;
+}
+.chat-input-area input {
+  flex: 1;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 0.6em 0.8em;
+  font-size: 0.95em;
+  margin-right: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.chat-input-area input:focus {
+    outline: none;
+    border-color: #004a99;
+    box-shadow: 0 0 0 2px rgba(0, 74, 153, 0.2);
+}
+.chat-input-area input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+.chat-input-area button {
+  background-color: #004a99;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6em 1em;
+  transition: background-color 0.2s;
+}
+.chat-input-area button:hover:not(:disabled) {
+  background-color: #003a7a;
+}
+.chat-input-area button:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+}
+
+/* Mensajes de advertencia/error en el chat */
+.chat-warning,
+.chat-error {
+  padding: 0.5rem 1rem;
+  font-size: 0.85em;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+  margin: 0;
+  border-radius: 0 0 8px 8px;
+}
+.chat-warning {
+  color: #856404;
+  background-color: #fff3cd;
+}
+.chat-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  font-weight: 500;
+}
+
+
+/* --- AJUSTES RESPONSIVOS --- */
+@media (max-width: 992px) { /* Tablets y móviles */
+    .detail-view-container.vertical-layout {
+        padding: 1.5rem;
+        min-height: calc(100vh - 3rem); /* Ajusta min-height */
+    }
+    .detail-header h2 {
+        font-size: 1.6em;
+    }
+    /* Ajustes responsivos para simulación */
+    .simulation-controls {
+        padding: 1rem;
+    }
+    .controls-row {
+        gap: 1rem;
+    }
+    .form-row {
+        flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+        gap: 0.5rem;
+    }
+     .add-change-form select,
+     .add-change-form input[type="number"] {
+        width: 100%;
+     }
+     .add-change-btn {
+         margin-top: 0.5rem;
+         width: 100%;
+         border-radius: 5px;
+         height: auto;
+         padding: 0.6rem;
+     }
+     .run-simulation-btn {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 0.5rem;
+     }
+     .graph-content-area-middle {
+        min-height: 300px;
+        height: 40vh;
+     }
+}
+
+
+@media (max-width: 768px) { /* Móviles */
+    .detail-view-container.vertical-layout {
+        padding: 1rem;
+        min-height: calc(100vh - 2rem);
+    }
+    .detail-header h2 {
+        font-size: 1.4em;
+    }
+    .graph-menu button {
+        font-size: 1em;
+        padding: 0.4em 0.8em;
+    }
+    .graph-content-area-middle {
+        min-height: 250px;
+        height: 35vh;
+    }
+    /* Chat ocupa más ancho */
+    .chat-panel-bottom {
+        width: calc(100% - 2rem);
+        left: 1rem;
+        right: 1rem;
+        bottom: 0.5rem;
+    }
+}
+
