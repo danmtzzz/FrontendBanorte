@@ -13,7 +13,7 @@
 
 .backButton {
   background: none;
-  border: none; 
+  border: none;
   color: #6C757D;
   cursor: pointer;
   font-size: 1rem;
@@ -100,7 +100,7 @@
   text-align: center;
 }
 
-/* --- ESTILOS DE LA NUEVA ZONA DE CARGA --- */
+/* --- ESTILOS DE LA ZONA DE CARGA --- */
 
 .fileInputHidden {
   display: none; /* Oculta el input feo */
@@ -165,11 +165,25 @@
   color: #FFFFFF;
 }
 
-.fileNameDisplay {
+/* Contenedor para el nombre y el botón Cancelar */
+.fileInfoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin-top: 1.5rem;
-  font-size: 1em;
-  color: #28a745; /* Verde para éxito */
-  text-align: center;
+  background-color: #F8F9FA;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+}
+
+/* Estilo del nombre del archivo */
+.fileNameDisplay {
+  margin-top: 0;
+  font-size: 0.9em;
+  color: #495057;
   font-weight: 500;
 }
 
