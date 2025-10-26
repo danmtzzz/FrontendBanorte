@@ -13,7 +13,7 @@
 
 .backButton {
   background: none;
-  border: none; 
+  border: none;
   color: #6C757D;
   cursor: pointer;
   font-size: 1rem;
@@ -40,8 +40,6 @@
   text-align: center;
 }
 
-/* --- AGREGA ESTAS CLASES a UploadView.module.css --- */
-
 /* Contenedor para los grupos de opciones */
 .optionGroup {
   width: 100%;
@@ -65,7 +63,7 @@
   border-radius: 8px;
   background-color: #F8F9FA;
   font-size: 1rem;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   cursor: pointer;
 }
 
@@ -131,7 +129,7 @@
   text-align: center;
 }
 
-/* --- ESTILOS DE LA NUEVA ZONA DE CARGA --- */
+/* --- ESTILOS DE LA ZONA DE CARGA --- */
 
 .fileInputHidden {
   display: none; /* Oculta el input feo */
@@ -196,10 +194,129 @@
   color: #FFFFFF;
 }
 
-.fileNameDisplay {
+/* Contenedor para el nombre y el botón Cancelar */
+.fileInfoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin-top: 1.5rem;
-  font-size: 1em;
-  color: #28a745; /* Verde para éxito */
-  text-align: center;
-  font-weight: 500;
+  background-color: #F8F9FA;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
 }
+
+/* Estilo del nombre del archivo */
+.fileNameDisplay {
+  margin-top: 0;
+  font-size: 0.9em;
+  color: #495057;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+/* Estilo para el botón "Cancelar" */
+.btnCancel {
+  background-color: #6C757D;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.4em 0.8em;
+  font-size: 0.8em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.btnCancel:hover {
+  background-color: #5a6268;
+}
+
+.btnCancel:disabled {
+  background-color: #ced4da;
+  cursor: not-allowed;
+}
+
+
+/* --- INICIO DEL CÓDIGO AÑADIDO PARA EL DASHBOARD INTERNO --- */
+
+/* Título del Dashboard interno ("Estadísticas Generales") */
+.dashboardTitle {
+  color: #EB0019; /* Rojo Banorte */
+  font-size: 1.8em; /* Un poco más pequeño que el h2 original */
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: left; /* Alineado a la izquierda */
+  width: 100%;
+  font-weight: bold;
+}
+
+/* Tarjeta para el gráfico */
+.chartCard {
+  background-color: #FFFFFF; /* Fondo blanco */
+  border-radius: 8px;
+  padding: 1rem; /* Padding más ajustado */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra suave */
+  margin-bottom: 1.5rem;
+  border: 1px solid #e9ecef; /* Borde muy claro */
+  min-height: 320px; /* Asegura espacio */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Texto de "Cargando..." para el gráfico */
+.loadingText {
+  font-size: 1em;
+  color: #6C757D;
+  font-family: Arial, sans-serif;
+}
+
+/* Contenedor para los botones de acción del dashboard */
+.actionsContainer {
+  display: flex;
+  gap: 1rem; /* Espacio entre botones */
+  width: 100%;
+  margin-top: 1rem; /* Espacio después del gráfico */
+}
+
+/* Botones de acción del dashboard ("Estadísticas", "Generar Reporte") */
+.actionButton {
+  flex: 1; /* Ocupan el mismo espacio */
+  background-color: #4a4a4a; /* Gris oscuro */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 1.5rem 1rem; /* Padding vertical generoso */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem; /* Tamaño de fuente base */
+  font-weight: 500;
+  text-align: center; /* Centrar texto si se rompe en dos líneas */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-height: 140px; /* Altura mínima */
+}
+
+.actionButton:hover {
+  background-color: #333; /* Gris más oscuro */
+}
+
+/* Íconos dentro de los botones de acción */
+.actionButton svg {
+  font-size: 2.2em; /* Tamaño del ícono */
+  margin-bottom: 0.8rem;
+}
+
+/* --- FIN DEL CÓDIGO AÑADIDO --- */

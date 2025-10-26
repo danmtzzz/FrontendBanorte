@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
-import styles from './UploadView.module.css'; // Importa el CSS Módulo
-import axios from 'axios'; // <-- ¡NUEVO! Importamos axios
+// src/views/UploadView.jsx
 
-// --- Ícono SVG (de tu código) ---
+// 1. IMPORTACIONES NECESARIAS (limpiadas)
+import React, { useState, useRef } from 'react';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts'; // Para el gráfico
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Para los íconos
+import { faChartSimple, faFileLines } from '@fortawesome/free-solid-svg-icons'; // Íconos
+import styles from './UploadView.module.css'; // Tus estilos
+
+// --- Ícono SVG (Sin cambios) ---
 const UploadIcon = () => (
-  <svg 
+  <svg
     className={styles.uploadIcon}
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
     strokeLinejoin="round"
   >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -21,50 +28,52 @@ const UploadIcon = () => (
 );
 // --- FIN del Ícono ---
 
+// --- DATOS DE EJEMPLO PARA EL GRÁFICO ---
+const datosDeEjemplo = [
+  { fecha: "Ene 23", Ahorro: 933131 }, { fecha: "Feb 23", Ahorro: 1825004 },
+  { fecha: "Mar 23", Ahorro: 2803839 }, { fecha: "Abr 23", Ahorro: 3609590 },
+  { fecha: "May 23", Ahorro: 4258505 }, { fecha: "Jun 23", Ahorro: 4987381 }
+];
+// ----------------------------------------
 
-function UploadView({ setView }) {
-  
+
+function UploadView({ setView }) { // Mantenemos setView por si necesitas volver al menu principal
+
   // --- ESTADOS ---
-  // 1. Cambiamos 'fileName' por 'selectedFile' para guardar el objeto File
-  const [selectedFile, setSelectedFile] = useState(null); 
-  const [isDragging, setIsDragging] = useState(false); // (de tu código)
-  
-  // 2. ¡NUEVOS ESTADOS! (de la lógica anterior)
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [userType, setUserType] = useState('personal');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null); // Para mensajes de éxito sin 'alert'
+  const [success, setSuccess] = useState(null);
+  const fileInputRef = useRef(null);
+  // --- NUEVO ESTADO PARA CONTROLAR LA VISTA INTERNA ---
+  const [showDashboardContent, setShowDashboardContent] = useState(false);
 
 
-  // --- Lógica de Manejo de Archivos ---
-
-  // 3. ¡LÓGICA ACTUALIZADA!
-  // Esta función centraliza la validación y guardado del *archivo*
+  // --- Lógica de Manejo de Archivos (Sin cambios) ---
   const handleFile = (file) => {
     if (file && (file.type === "application/vnd.ms-excel" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
-      setSelectedFile(file); // <-- Guarda el objeto File
-      setError(null);      // Limpia errores
-      setSuccess(null);    // Limpia éxito
+      setSelectedFile(file);
+      setError(null);
+      setSuccess(null);
     } else {
-      setSelectedFile(null); // Limpia el archivo
+      setSelectedFile(null);
       if (file) {
-        // Usamos el estado de error, no un 'alert'
         setError("Por favor, selecciona solo archivos .xls o .xlsx");
       }
     }
   };
 
-  // 4. (de tu código) Manejador para el <input type="file">
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
       handleFile(event.target.files[0]);
     }
   };
 
-  // 5. (de tu código) Manejadores de Drag-and-Drop
   const handleDragOver = (event) => {
-    event.preventDefault(); 
-    if (!loading) setIsDragging(true); // Solo si no está cargando
+    event.preventDefault();
+    if (!loading) setIsDragging(true);
   };
 
   const handleDragLeave = (event) => {
@@ -75,7 +84,7 @@ function UploadView({ setView }) {
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
-    if (loading) return; // No hacer nada si está cargando
+    if (loading) return;
 
     if (event.dataTransfer.files.length > 0) {
       handleFile(event.dataTransfer.files[0]);
@@ -83,154 +92,210 @@ function UploadView({ setView }) {
     }
   };
 
-  // 6. ¡NUEVO! Manejador para el selector de tipo
   const handleTypeChange = (event) => {
     setUserType(event.target.value);
   };
 
-  // 7. ¡NUEVO! Manejador para el botón "Regresar"
+  // Botón Volver / Cargar otro
   const handleReturn = () => {
     if (!loading) {
-      setView('main');
+      if (showDashboardContent) {
+        setShowDashboardContent(false); // Vuelve a la vista de carga
+        setSelectedFile(null);       // Limpia el archivo
+        setSuccess(null);
+        setError(null); // Limpia errores también
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null; // Resetea input
+        }
+      } else {
+        setView('main'); // Vuelve al menú principal (si vienes de ahí)
+      }
     }
   };
 
-  // 8. ¡NUEVA LÓGICA! Para el botón "Aceptar y Analizar"
-  const handleAccept = async () => {
+  // Botón Cancelar archivo seleccionado
+  const handleCancelFile = () => {
+    if (loading) return;
+    setSelectedFile(null);
+    setError(null);
+    setSuccess(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
+  };
+
+  // Botón Aceptar y Analizar (AHORA MUESTRA EL DASHBOARD INTERNO)
+  const handleAccept = () => {
     if (!selectedFile) {
-        setError('Por favor, selecciona un archivo primero.');
-        return;
+      setError('Por favor, selecciona un archivo primero.');
+      return;
     }
 
     setLoading(true);
     setError(null);
     setSuccess(null);
-    
-    const formData = new FormData();
-    formData.append('file', selectedFile);
 
-    // Ajusta esta URL a tu endpoint de FastAPI
-    const backendUrl = `http://127.0.0.1:8000/upload/?tipo_usuario=${userType}`;
+    // Simula el procesamiento del archivo
+    setTimeout(() => {
+      setLoading(false);
+      // setSuccess('¡Archivo procesado!'); // Mensaje opcional
+      setShowDashboardContent(true); // <-- MUESTRA EL DASHBOARD
 
-    try {
-        const response = await axios.post(backendUrl, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+    }, 1500); // Simula 1.5 segundos
+  };
 
-        console.log('Respuesta del backend:', response.data);
-        setSuccess('¡Archivo subido con éxito! Listo para analizar.');
-        setSelectedFile(null); // Limpia el archivo después de subirlo
-        
-        // Futuro paso: setView('dashboard');
-
-    } catch (err) {
-        console.error('Error al subir el archivo:', err);
-        setError('Hubo un error al subir el archivo. Revisa la consola.');
-    } finally {
-        setLoading(false);
-    }
+  // (Opcional) Función para el botón "Generar Reporte" del dashboard interno
+  const handleGenerarReporte = () => {
+      console.log("Generando reporte...");
+      // Aquí iría la lógica
   };
 
 
   // --- RENDERIZADO ---
   return (
+    // Contenedor blanco principal
     <div className={styles.uploadViewContainer}>
-      {/* Botón Volver (actualizado con el nuevo handler) */}
-      <button 
-        className={styles.backButton} 
-        onClick={handleReturn} // <-- Usa el handler
-        disabled={loading} // <-- Deshabilitado si carga
+
+      {/* Botón Volver / Cargar Otro Archivo */}
+      <button
+        className={styles.backButton}
+        onClick={handleReturn}
+        disabled={loading}
       >
-        &larr; Volver al Dashboard
+        {/* Usamos el símbolo de flecha unicode */}
+        {showDashboardContent ? '← Cargar otro archivo' : '← Volver al Menú'}
       </button>
-      
-      <h2>Cargar archivo de Excel</h2>
-      <p>Arrastra tu archivo .xls o .xlsx aquí para analizarlo.</p>
-      
-      {/* --- ¡NUEVO! Selector de Tipo de Cuenta --- */}
-      <div className={styles.optionGroup}>
-          <label htmlFor="user-type-select">Tipo de Cuenta:</label>
-          <select 
-              id="user-type-select" 
-              value={userType} 
+
+      {/* --- RENDERIZADO CONDICIONAL: DASHBOARD O UPLOAD --- */}
+      {showDashboardContent ? (
+
+        /* --- CONTENIDO DEL DASHBOARD --- */
+        <>
+          {/* Título del Dashboard */}
+          <h2 className={styles.dashboardTitle}>Estadísticas Generales</h2>
+
+          {/* Tarjeta del Gráfico */}
+          <div className={styles.chartCard}>
+            {loading ? ( // Mantenemos el loader por si acaso
+              <p className={styles.loadingText}>Cargando gráfico...</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={datosDeEjemplo} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="fecha" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="Ahorro" stroke="#007bff" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          {/* Botones de Acción del Dashboard */}
+          <div className={styles.actionsContainer}>
+            <button className={styles.actionButton}>
+              <FontAwesomeIcon icon={faChartSimple} />
+              <span>Estadísticas Detalladas</span>
+            </button>
+            <button className={styles.actionButton} onClick={handleGenerarReporte}>
+              <FontAwesomeIcon icon={faFileLines} />
+              <span>Generar Nuevo Reporte</span>
+            </button>
+          </div>
+        </>
+        /* --- FIN DEL DASHBOARD --- */
+
+      ) : (
+
+        /* --- CONTENIDO DE UPLOAD (Tu código original) --- */
+        <>
+          <h2>Cargar archivo de Excel</h2>
+          <p>Arrastra tu archivo .xls o .xlsx aquí para analizarlo.</p>
+
+          {/* Selector de Tipo */}
+          <div className={styles.optionGroup}>
+            <label htmlFor="user-type-select">Tipo de Cuenta:</label>
+            <select
+              id="user-type-select"
+              value={userType}
               onChange={handleTypeChange}
               disabled={loading}
-          >
+            >
               <option value="personal">Finanzas Personales</option>
               <option value="pyme">Finanzas PYME</option>
-          </select>
-      </div>
+            </select>
+          </div>
 
-      {/* --- Zona de "Drag and Drop" (actualizada) --- */}
-      <div 
-        // Clases dinámicas: aplica 'dragOver' o 'disabledLabel' (si está cargando)
-        className={`
-          ${styles.dropZone} 
-          ${isDragging ? styles.dragOver : ''}
-          ${loading ? styles.disabledLabel : ''} 
-        `}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        <input 
-          type="file" 
-          id="file-upload" 
-          className={styles.fileInputHidden} 
-          accept=".xlsx, .xls"
-          onChange={handleFileChange}
-          disabled={loading} // <-- Deshabilitado si carga
-        />
-        
-        <UploadIcon /> 
-        
-        <p className={styles.uploadText}>
-          Arrastra y suelta tu archivo aquí
-        </p>
-        <p className={styles.uploadSubtext}>o</p>
-
-        {/* El label también se deshabilita visualmente */}
-        <label 
-          htmlFor="file-upload" 
-          className={`
-            ${styles.selectButton} 
-            ${loading ? styles.disabledLabel : ''}
-          `}
-        >
-          Seleccionar Archivo
-        </label>
-      </div>
-      {/* --- FIN de la Zona --- */}
-
-      {/* --- ¡NUEVO! Mensajes de Estado --- */}
-      {error && (
-        <p className={styles.errorInfo}>{error}</p>
-      )}
-      {success && (
-        <p className={styles.successInfo}>{success}</p>
-      )}
-
-      {/* Actualizado para usar 'selectedFile' */}
-      {selectedFile && !error && (
-        <p className={styles.fileNameDisplay}>
-          Archivo seleccionado: <strong>{selectedFile.name}</strong>
-        </p>
-      )}
-
-      {/* --- ¡NUEVO! Botón de Aceptar --- */}
-      <div className={styles.buttonGroup}>
-          <button 
-              className={styles.btnAccept} 
-              onClick={handleAccept}
-              // Deshabilitado si no hay archivo O si está cargando
-              disabled={!selectedFile || loading}
+          {/* Zona Drag and Drop */}
+          <div
+            className={`
+              ${styles.dropZone}
+              ${isDragging ? styles.dragOver : ''}
+              ${loading ? styles.disabledLabel : ''}
+            `}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
+            <input
+              type="file"
+              id="file-upload"
+              className={styles.fileInputHidden}
+              accept=".xlsx, .xls"
+              onChange={handleFileChange}
+              disabled={loading}
+              ref={fileInputRef} // <-- La ref sigue aquí
+            />
+            <UploadIcon />
+            <p className={styles.uploadText}>Arrastra y suelta tu archivo aquí</p>
+            <p className={styles.uploadSubtext}>o</p>
+            <label
+              htmlFor="file-upload"
+              className={`
+                ${styles.selectButton}
+                ${loading ? styles.disabledLabel : ''}
+              `}
+            >
+              Seleccionar Archivo
+            </label>
+          </div>
+
+          {/* Mensajes de Estado */}
+          {error && <p className={styles.errorInfo}>{error}</p>}
+          {success && <p className={styles.successInfo}>{success}</p>}
+
+          {/* Contenedor del Archivo Seleccionado y Cancelar */}
+          {selectedFile && !error && (
+            <div className={styles.fileInfoContainer}>
+              <p className={styles.fileNameDisplay}>
+                Archivo seleccionado: <strong>{selectedFile.name}</strong>
+              </p>
+              <button
+                className={styles.btnCancel}
+                onClick={handleCancelFile}
+                disabled={loading}
+              >
+                Cancelar
+              </button>
+            </div>
+          )}
+
+          {/* Botón Aceptar y Analizar */}
+          <div className={styles.buttonGroup}>
+            <button
+              className={styles.btnAccept}
+              onClick={handleAccept}
+              disabled={!selectedFile || loading}
+            >
               {loading ? 'Cargando...' : 'Aceptar y Analizar'}
-          </button>
-      </div>
+            </button>
+          </div>
+        </>
+        /* --- FIN DEL UPLOAD --- */
+
+      )} {/* --- FIN DEL CONDICIONAL --- */}
     </div>
-  )
+  );
 }
 
 export default UploadView;
-
