@@ -2,7 +2,7 @@
 
 .uploadViewContainer {
   width: 100%;
-  max-width: 700px;
+  max-width: 1200px; /* Ancho máximo del contenedor */
   background-color: #FFFFFF;
   border-radius: 12px;
   padding: 2.5rem;
@@ -25,6 +25,7 @@
   color: #EB0019;
 }
 
+/* Estilo para el h2 principal (tanto en upload como en dashboard) */
 .uploadViewContainer h2 {
   color: #212529;
   font-size: 2rem;
@@ -33,6 +34,14 @@
   text-align: center;
 }
 
+/* Título h2 específico del Dashboard (cuando se muestran resultados) */
+.dashboardTitle {
+  font-size: 1.8rem; /* Un poco más pequeño que el de "Cargar Archivo" */
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Párrafo de descripción en la vista de carga */
 .uploadViewContainer p {
   color: #6C757D;
   font-size: 1.1rem;
@@ -40,67 +49,7 @@
   text-align: center;
 }
 
-/* Clase para deshabilitar el label de subida y el botón 'seleccionar' */
-.disabledLabel {
-  background-color: #e9ecef !important; /* !important para sobreescribir el hover */
-  cursor: not-allowed !important;
-  opacity: 0.7;
-}
-
-/* Contenedor para el botón de Aceptar */
-.buttonGroup {
-  width: 100%;
-  margin-top: 1rem;
-}
-
-/* Estilo del botón de Aceptar */
-.btnAccept {
-  width: 100%;
-  padding: 0.85rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  color: white;
-  position: relative; /* ¡MUY IMPORTANTE! */
-  overflow: hidden;   /* Para que la barra no se salga */
-  background-color: #EB0019; /* Color de fondo base */
-  transition: background-color 0.2s, transform 0.2s;
-}
-
-.btnAccept:hover {
-  background-color: #c90016; /* Un rojo más oscuro */
-  transform: translateY(-2px);
-}
-
-/* Estilo del botón Aceptar cuando está deshabilitado */
-.btnAccept:disabled {
-  background-color: #ced4da; /* Gris */
-  color: #6c757d;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Estilo para el mensaje de error */
-.errorInfo {
-  margin-top: 1rem;
-  font-size: 0.9em;
-  color: #c90016; /* Rojo */
-  font-weight: 500;
-  text-align: center;
-}
-
-/* Estilo para el mensaje de éxito */
-.successInfo {
-  margin-top: 1rem;
-  font-size: 0.9em;
-  color: #007bff; /* Un azul/verde estaría bien */
-  font-weight: 500;
-  text-align: center;
-}
-
-/* --- ESTILOS DE LA ZONA DE CARGA --- */
+/* --- ESTILOS DE LA ZONA DE CARGA (UPLOAD) --- */
 
 .fileInputHidden {
   display: none; /* Oculta el input feo */
@@ -122,9 +71,8 @@
   box-sizing: border-box;
 }
 
-/* Estilo al arrastrar un archivo sobre la zona */
 .dropZone.dragOver {
-  border-color: #EB0019;
+  border-color: #c90016; /* Más oscuro */
   background-color: #fff8f8; /* Tono rojo muy claro */
 }
 
@@ -136,7 +84,7 @@
 }
 
 .uploadText {
-  font-size: 1.1em !important;
+  font-size: 1.1em !important; /* !important para sobreescribir la 'p' general */
   font-weight: 600;
   color: #333 !important;
   margin-bottom: 0.5rem !important;
@@ -162,6 +110,7 @@
 
 .selectButton:hover {
   background-color: #EB0019;
+  border-color: #EB0019;
   color: #FFFFFF;
 }
 
@@ -179,56 +128,305 @@
   box-sizing: border-box;
 }
 
-/* Estilo del nombre del archivo */
 .fileNameDisplay {
-  margin-top: 0;
+  margin: 0; /* Quitamos el margin-top que tenía */
   font-size: 0.9em;
   color: #495057;
   font-weight: 500;
+  /* Para evitar que el texto largo se desborde */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 1rem;
 }
 
-/* --- AGREGA ESTA CLASE a UploadView.module.css --- */
-
-/* Estilo para el contenedor del JSON */
-.jsonViewer {
-  width: 100%;
-  max-height: 400px; /* Le damos una altura máxima */
-  overflow-y: auto; /* Scroll vertical si el JSON es muy largo */
-  background-color: #f8f9fa; /* Fondo claro */
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  text-align: left; /* Alineamos el texto a la izquierda */
-  box-sizing: border-box;
-}
-
-/* Estilo para el tag <pre> dentro del visor */
-.jsonViewer pre {
-  margin: 0;
-  font-family: 'Courier New', Courier, monospace; /* Fuente monoespaciada */
+/* --- CLASE FALTANTE --- */
+/* Botón "Cancelar" al seleccionar un archivo */
+.btnCancel {
+  background: none;
+  border: none;
+  color: #EB0019;
+  font-weight: 600;
   font-size: 0.9em;
-  color: #212529;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+.btnCancel:hover {
+  color: #c90016;
+}
+.btnCancel:disabled {
+  color: #6c757d;
+  cursor: not-allowed;
 }
 
-/* La barra de progreso (el relleno) */
+
+/* --- ESTILOS DE BOTONES Y PROGRESO --- */
+
+.disabledLabel {
+  background-color: #e9ecef !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+.buttonGroup {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btnAccept {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+  position: relative; 
+  overflow: hidden;  
+  background-color: #EB0019; 
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.btnAccept:hover:not(:disabled) {
+  background-color: #c90016; 
+  transform: translateY(-2px);
+}
+
+.btnAccept:disabled {
+  background-color: #ced4da; 
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .progressBar {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  width: 0%; /* Inicia en 0% */
-  background-color: #c90016; /* Rojo más oscuro que el fondo */
-  transition: width 0.1s linear; /* Animación suave */
-  z-index: 1; /* Se pone detrás del texto */
+  width: 0%; 
+  background-color: #c90016; 
+  transition: width 0.1s linear; 
+  z-index: 1; 
 }
 
-/* El texto del botón */
 .progressText {
-  position: relative; /* Se pone encima de la barra */
+  position: relative; 
   z-index: 2;
-  /* El color se hereda del .btnAccept (blanco) */
-  /* o de .btnAccept:disabled (gris oscuro) */
-  /* ¡Así que no necesita color propio! */
+}
+
+.errorInfo {
+  margin-top: 1rem;
+  font-size: 0.9em;
+  color: #c90016; /* Rojo */
+  font-weight: 500;
+  text-align: center;
+}
+
+/* --- ESTILOS DEL DASHBOARD (RESULTADOS) --- */
+
+/* Contenedor de las 3 tarjetas de estadísticas (Ingresos, Gastos, Balance) */
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
+  gap: 1.5rem; 
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background-color: #f8f9fa; 
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  text-align: center; 
+}
+
+.statCard p {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6c757d; 
+}
+
+.statCard h3 {
+  margin: 0;
+  font-size: 1.75rem; /* Ajustado para mejor visibilidad */
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statCard.ingresos h3 {
+  color: #28a745; /* Verde */
+}
+.statCard.gastos h3 {
+  color: #EB0019; /* Rojo */
+}
+.statCard.balance h3 {
+  color: #004a99; /* Azul */
+}
+
+/* Tarjeta grande para la gráfica */
+.chartCardLarge {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  margin-bottom: 1.5rem;
+}
+
+.chartTitle {
+  font-size: 1.25rem;
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+/* --- CLASE FALTANTE --- */
+/* Texto de "Cargando..." o "No hay datos" dentro de la gráfica */
+.loadingText {
+  color: #6c757d;
+  font-size: 1rem;
+  text-align: center;
+  padding: 4rem 0;
+}
+
+/* --- CLASE FALTANTE --- */
+/* Contenedor para el botón "Estadísticas Detalladas" */
+.actionsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Alinea el botón al centro */
+  margin-bottom: 1.5rem;
+}
+
+/* --- CLASE FALTANTE --- */
+/* Botón "Estadísticas Detalladas" */
+.actionButton {
+  background-color: #004a99; /* Azul Banorte */
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.actionButton:hover {
+  background-color: #003a7a;
+  transform: translateY(-2px);
+}
+.actionButton:disabled {
+  background-color: #ced4da;
+  cursor: not-allowed;
+}
+
+/* --- CLASE FALTANTE --- */
+/* Tarjeta para la recomendación de la IA */
+.iaRecommendationCard {
+  width: 100%;
+  background-color: #fff8f8; /* Fondo rojo muy claro */
+  border: 1px solid #f5c6cb; /* Borde rojo claro */
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-sizing: border-box;
+}
+
+/* --- CLASE FALTANTE --- */
+/* Estilo del texto que viene de la IA */
+.iaText {
+  color: #000000; /* Texto oscuro (no negro) */
+  font-size: 0.95rem;
+  line-height: 1.6;
+    text-align: justify;
+}
+.iaText h4 {
+  color: #EB0019; /* Títulos en rojo */
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.iaText p {
+  color: #58151c; /* Asegura que los párrafos <p> también tengan el color */
+  text-align: left; /* Alinea el texto de la IA a la izquierda */
+  margin-bottom: 0.5rem;
+}
+.iaText strong {
+  font-weight: 700; /* Asegura que las negritas se vean bien */
+}
+.iaText br {
+  display: block;
+  content: "";
+  margin-top: 0.75rem;
+}
+
+
+/* --- RESPONSIVIDAD (Media Queries) --- */
+
+@media (max-width: 768px) {
+  .uploadViewContainer {
+    padding: 1.5rem; /* Menos padding en móvil */
+  }
+
+  /* Las 3 tarjetas de estadísticas se apilan verticalmente */
+  .statsContainer {
+    grid-template-columns: 1fr; /* Una sola columna */
+    gap: 1rem;
+  }
+
+  .statCard h3 {
+    font-size: 1.5rem; /* Texto más pequeño en móvil */
+  }
+
+  .chartCardLarge {
+    padding: 1rem; /* Menos padding en la gráfica */
+  }
+
+  .iaRecommendationCard {
+    padding: 1rem 1.5rem; /* Menos padding en la tarjeta de IA */
+  }
+
+  /* El botón de estadísticas ocupa todo el ancho */
+  .actionsContainer {
+    justify-content: stretch;
+  }
+  .actionButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .uploadViewContainer {
+    padding: 1rem;
+  }
+  
+  .uploadViewContainer h2,
+  .dashboardTitle {
+    font-size: 1.5rem; /* Títulos más pequeños */
+  }
+
+  .dropZone {
+    padding: 1.5rem;
+  }
+
+  .uploadText {
+    font-size: 1em !important;
+  }
+
+  .btnAccept {
+    font-size: 1rem;
+  }
 }

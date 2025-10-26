@@ -1,8 +1,8 @@
-// 1. IMPORTACIONES COMPLETAS (¡Con BarChart!)
+// 1. IMPORTACIONES COMPLETAS (Con BarChart)
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-  BarChart, Bar, Cell // <-- ¡NUEVO! Importa los componentes de Gráfica de Barras
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, Cell // Importamos BarChart
 } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; 
 import { faChartSimple } from '@fortawesome/free-solid-svg-icons';
@@ -28,7 +28,7 @@ const UploadIcon = () => (
 );
 // --- FIN del Ícono ---
 
-// --- FUNCIÓN PARA FORMATEAR NÚMEROS GRANDES (K, M, B) (Sin cambios) ---
+// --- FUNCIÓN PARA FORMATEAR NÚMEROS (K, M, B) (Sin cambios) ---
 const formatYAxisTick = (value) => {
   if (value >= 1000000000) {
     return `${(value / 1000000000).toFixed(1)}B`;
@@ -40,8 +40,8 @@ const formatYAxisTick = (value) => {
   return value.toString();
 };
 
-// --- *** FUNCIÓN DE TRANSFORMACIÓN (ACTUALIZADA) *** ---
-// Esta función ahora procesa el 'analisis_descriptivo' para la gráfica de BARRAS
+// --- *** FUNCIÓN DE TRANSFORMACIÓN (CORREGIDA) *** ---
+// Esta función SÍ funciona con tu JSON. Procesa los gastos para la gráfica de BARRAS
 const transformarDatosParaBarras = (apiData) => {
   if (!apiData || !apiData.analisis_descriptivo || !apiData.analisis_descriptivo.principales_gastos_por_categoria) {
     console.error("Estructura de datos inesperada o sin gastos:", apiData);
@@ -50,7 +50,7 @@ const transformarDatosParaBarras = (apiData) => {
   
   const gastos = apiData.analisis_descriptivo.principales_gastos_por_categoria;
   
-  // Convertimos el objeto {"Ahorro": 100, "Comida": 50} en un array [{name: "Ahorro", monto: 100}, {name: "Comida", monto: 50}]
+  // Convierte el objeto {"Ahorro": 100, ...} en un array [{name: "Ahorro", monto: 100}, ...]
   return Object.keys(gastos).map(categoria => ({
     name: categoria,
     monto: gastos[categoria]
@@ -58,12 +58,19 @@ const transformarDatosParaBarras = (apiData) => {
 };
 // -----------------------------------------------------------
 
+// --- *** NUEVA FUNCIÓN *** ---
+// Formateador de moneda simple
+const formatCurrency = (value) => {
+  if (value === undefined || value === null) return "$0.00";
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value);
+};
+
 // Colores para la gráfica de barras
 const COLORS = ['#EB0019', '#004a99', '#ffc107', '#28a745', '#6c757d', '#17a2b8'];
 
 
 // === EL COMPONENTE PRINCIPAL ===
-function UploadView({ setView }) {
+function UploadView({ setView, uploadSnapshot, setUploadSnapshot }) {
 
   // --- ESTADOS (Sin cambios) ---
   const [selectedFile, setSelectedFile] = useState(null);
@@ -88,6 +95,14 @@ function UploadView({ setView }) {
       isStillLoadingRef.current = false;
     };
   }, []); 
+
+  // Si App dejó un snapshot (por ejemplo venimos de DetailView), lo usamos para mostrar el dashboard
+  useEffect(() => {
+    if (uploadSnapshot) {
+      setAnalysisResult(uploadSnapshot);
+      setShowDashboardContent(true);
+    }
+  }, [uploadSnapshot, setUploadSnapshot]);
 
   // --- Handlers (Sin cambios) ---
   const handleFile = (file) => {
@@ -129,7 +144,7 @@ function UploadView({ setView }) {
     }
    };
   
-  // Botón Volver / Cargar otro (Sin cambios)
+  // Botón Volver / Cargar otro
   const handleReturn = () => {
     if (!loading) {
       if (showDashboardContent) {
@@ -147,6 +162,15 @@ function UploadView({ setView }) {
     }
   };
 
+  // Manejador para ir a la vista de detalle
+  const handleViewDetail = () => {
+    if (analysisResult) {
+      // Aseguramos que App guarde el snapshot para poder restaurarlo al volver
+      if (setUploadSnapshot) setUploadSnapshot(analysisResult);
+      setView('detail');
+    }
+  };
+
   // Botón Cancelar archivo seleccionado (Sin cambios)
   const handleCancelFile = () => {
     if (loading) return;
@@ -159,7 +183,7 @@ function UploadView({ setView }) {
   };
 
 
-  // --- LÓGICA DE SUBIDA Y ANÁLISIS ---
+  // --- LÓGICA DE SUBIDA Y ANÁLISIS (Sin cambios, ya está correcta) ---
   const handleAccept = async () => {
     if (!selectedFile) {
         setError('Por favor, selecciona un archivo primero.');
@@ -174,7 +198,7 @@ function UploadView({ setView }) {
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    // Simulación de progreso (la ajusté un poco, puedes cambiarla)
+    // Simulación de progreso
     const simulateProgress = () => {
       if (!isStillLoadingRef.current) return;
       const randomIncrement = Math.random() * 14 + 1; 
@@ -196,7 +220,6 @@ function UploadView({ setView }) {
     const formData = new FormData();
     formData.append('file', selectedFile);
     
-    // --- URL DE LA API (Corregida a la que pusiste en tu código) ---
     const backendUrl = `http://129.213.136.1/api/v1/analisis/financiero`; 
     const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
@@ -210,12 +233,13 @@ function UploadView({ setView }) {
         setTimeout(() => {
           console.log('Respuesta del backend:', response.data);
           setAnalysisResult(response.data);
+          // Guardamos un snapshot en App para poder volver desde DetailView
+          if (setUploadSnapshot) setUploadSnapshot(response.data);
           setShowDashboardContent(true);     
           setLoading(false);                 
         }, 300);
 
     } catch (err) {
-        // --- MANEJO DE ERROR (Sin cambios) ---
         isStillLoadingRef.current = false; 
         clearTimeout(timeoutRef.current); 
         console.error('Error al subir el archivo:', err);
@@ -250,16 +274,34 @@ function UploadView({ setView }) {
       {showDashboardContent && analysisResult ? (
         /* --- A. CONTENIDO DEL DASHBOARD --- */
         <>
-          {/* Título del Dashboard (Ahora usa el 'tipo_archivo' del JSON) */}
           <h2 className={styles.dashboardTitle}>
             Análisis de: {analysisResult.tipo_archivo || "Estadísticas Generales"}
           </h2>
 
-          {/* --- *** GRÁFICA ACTUALIZADA A BARRAS *** --- */}
+          {/* --- *** NUEVO *** --- */}
+          {/* Contenedor para las 3 Tarjetas de Estadísticas que pediste */}
+          <div className={styles.statsContainer}>
+            <div className={`${styles.statCard} ${styles.ingresos}`}>
+              <p>Total Ingresos</p>
+              <h3>{formatCurrency(analysisResult.analisis_descriptivo?.total_ingresos)}</h3>
+            </div>
+            <div className={`${styles.statCard} ${styles.gastos}`}>
+              <p>Total Gastos</p>
+              <h3>{formatCurrency(analysisResult.analisis_descriptivo?.total_gastos)}</h3>
+            </div>
+            <div className={`${styles.statCard} ${styles.balance}`}>
+              <p>Balance Neto</p>
+              <h3>{formatCurrency(analysisResult.analisis_descriptivo?.balance_neto)}</h3>
+            </div>
+          </div>
+          {/* --- FIN DE LAS TARJETAS --- */}
+
+
+          {/* --- GRÁFICA DE BARRAS (CORREGIDA) --- */}
           <div className={styles.chartCardLarge}>
             <h3 className={styles.chartTitle}>Principales Gastos por Categoría</h3>
             {(() => {
-                // Procesa los datos de la API con la nueva función de BARRAS
+                // USA LA FUNCIÓN CORREGIDA
                 const chartData = transformarDatosParaBarras(analysisResult); 
                 
                 if (chartData.length > 0) {
@@ -269,8 +311,7 @@ function UploadView({ setView }) {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis tickFormatter={formatYAxisTick} />
-                        <Tooltip formatter={(value) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)} />
-                        {/* <Legend /> - No se ve tan bien en gráficas de barras con colores */}
+                        <Tooltip formatter={(value) => formatCurrency(value)} />
                         <Bar dataKey="monto">
                           {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -280,37 +321,36 @@ function UploadView({ setView }) {
                     </ResponsiveContainer>
                   );
                 } else {
+                  // ESTE ES EL MENSAJE QUE VEÍAS (pero ahora por una razón válida)
                   return <p className={styles.loadingText}>No se encontraron datos de gastos para graficar.</p>;
                 }
             })()}
           </div>
           {/* --- FIN DEL GRÁFICO --- */}
 
-          {/* Botón de Acción Único (Sin cambios) */}
+          {/* Botón de Acción */}
           <div className={styles.actionsContainer}>
-             <button className={styles.actionButton}>
+             <button 
+              className={styles.actionButton}
+              onClick={handleViewDetail}
+             >
               <FontAwesomeIcon icon={faChartSimple} />
               <span>Estadísticas Detalladas</span>
             </button>
           </div>
           
-          {/* --- RECOMENDACIÓN DE LA IA --- */}
+          {/* Recomendación de la IA (Sin cambios) */}
           {analysisResult.analisis_ia && analysisResult.analisis_ia.recomendacion && (
             <div className={styles.iaRecommendationCard}>
               <h3 className={styles.chartTitle}>Recomendación de la IA</h3>
-              {/* Usamos 'dangerouslySetInnerHTML' para renderizar el HTML/Markdown que viene de la IA */}
-              {/* Lo separamos en párrafos para mejor lectura */}
               <div 
                 className={styles.iaText}
                 dangerouslySetInnerHTML={{ 
                   __html: analysisResult.analisis_ia.recomendacion
-                            .replace(/### (.*?)\n/g, '<h4>$1</h4>') // Convierte ### a h4
-                            .replace(/1\. (.*?)\n/g, '<p><b>1. $1</b></p>') // Pone puntos principales en negrita
-                            .replace(/2\. (.*?)\n/g, '<p><b>2. $1</b></p>')
-                            .replace(/3\. (.*?)\n/g, '<p><b>3. $1</b></p>')
-                            .replace(/4\. (.*?)\n/g, '<p><b>4. $1</b></p>')
-                            .replace(/5\. (.*?)\n/g, '<p><b>5. $1</b></p>')
-                            .replace(/- (.*?)\n/g, '<p style="padding-left: 1rem;">- $1</p>') // Indenta sub-puntos
+                            .replace(/### (.*?)\n/g, '<h4>$1</h4>') 
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Pone **texto** en negrita
+                            .replace(/\n\n/g, '<br/>') // Añade saltos de línea
+                            .replace(/- (.*?)\n/g, '<p style="padding-left: 1rem;">- $1</p>')
                 }} 
               />
             </div>
@@ -320,12 +360,11 @@ function UploadView({ setView }) {
         /* --- FIN DEL DASHBOARD --- */
 
       ) : (
-        /* --- B. CONTENIDO DE UPLOAD --- */
+        /* --- B. CONTENIDO DE UPLOAD (Sin cambios) --- */
         <>
           <h2>Cargar archivo de Excel</h2>
           <p>Arrastra tu archivo .xls o .xlsx aquí para analizarlo.</p>
 
-          {/* Zona Drag and Drop (Sin cambios) */}
           <div
             className={`
               ${styles.dropZone}
@@ -355,30 +394,27 @@ function UploadView({ setView }) {
                 ${loading ? styles.disabledLabel : ''}
               `}
             >
-              Seleccionar Archivo
+              Selecciona tu Archivo
             </label>
           </div>
 
-          {/* Mensajes de Estado (Sin cambios) */}
           {error && <p className={styles.errorInfo}>{error}</p>}
           
-          {/* Contenedor del Archivo Seleccionado y Cancelar (Sin cambios) */}
           {selectedFile && !error && (
             <div className={styles.fileInfoContainer}>
               <p className={styles.fileNameDisplay}>
                 Archivo seleccionado: <strong>{selectedFile.name}</strong>
               </p>
-              {/*<button
+              <button
                 className={styles.btnCancel}
                 onClick={handleCancelFile}
                 disabled={loading}
               >
                 Cancelar
-              </button>*/}
+              </button>
             </div>
           )}
 
-          {/* Botón Aceptar y Analizar (Sin cambios) */}
           <div className={styles.buttonGroup}>
             <button
               className={styles.btnAccept}
