@@ -138,7 +138,7 @@ function UploadView({ setView }) {
     
     // --- ¡URL ACTUALIZADA! ---
     // Ya no se envía el parámetro 'tipo_usuario'
-    const backendUrl = `http://127.0.0.1:8000/upload/`; 
+    const backendUrl = `http://129.213.136.1/api/v1/analisis/financiero`; 
     
     const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 

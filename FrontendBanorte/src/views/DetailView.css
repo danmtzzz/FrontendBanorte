@@ -1,0 +1,225 @@
+/* --- ESTILOS ESPECÍFICOS PARA DETAILVIEW --- */
+
+/* Estilo base del botón "Volver", copiado de App.css 
+   para que este archivo sea independiente */
+.back-button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #FFFFFF; /* Color por defecto (para fondo oscuro) */
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.25s;
+  margin-bottom: 1em;
+}
+.back-button:hover {
+  opacity: 1;
+}
+
+/* Contenedor principal de la vista de detalle */
+.detail-view-container.vertical-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  text-align: left;
+  padding: 2rem; 
+  box-sizing: border-box;
+  overflow: hidden; 
+  position: relative; /* Contexto para el chat flotante */
+}
+
+/* Encabezado (Alineado a la izquierda) */
+.detail-header {
+  width: 100%;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+  display: flex;
+  justify-content: flex-start; 
+  gap: 1.5rem; 
+  align-items: center;
+  flex-shrink: 0; 
+}
+
+.detail-header h2 {
+  margin: 0;
+  font-size: 2em;
+  font-weight: 600;
+  color: #C00;
+}
+
+/* Botón "Volver" en modo oscuro (fondo blanco) */
+.back-button.dark-text {
+  color: #4a4a4a;
+  opacity: 0.7;
+  align-self: center;
+  margin-bottom: 0;
+}
+.back-button.dark-text:hover {
+  color: #000000;
+  opacity: 1;
+}
+
+/* --- ESTILOS PARA EL MENÚ DE GRÁFICAS --- */
+.graph-menu {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  margin-top: 1rem;
+  flex-shrink: 0; /* No se encoge */
+}
+.graph-menu button {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0.5em 1em;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s ease;
+}
+.graph-menu button:hover {
+  background-color: #f9f9f9;
+}
+.graph-menu button.active {
+  color: #C00; /* Rojo de tu tema */
+  border-bottom-color: #C00;
+  font-weight: 600;
+}
+/* --- FIN DE NUEVOS ESTILOS --- */
+
+
+/* Área de Gráfica (ocupa el espacio central) */
+.graph-content-area-middle {
+  flex: 1; /* Ocupa todo el espacio disponible */
+  background-color: #ffffff; /* Fondo blanco limpio */
+  border-radius: 8px;
+  margin-top: 1rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: #888;
+  overflow: auto; 
+  /* Asegura que tenga una altura mínima */
+  min-height: 300px;
+}
+
+/* Panel de Chat (flotando en la esquina derecha) */
+.chat-panel-bottom {
+  position: fixed; 
+  bottom: 2rem;
+  right: 2rem;
+  
+  width: 400px; 
+  max-width: 90vw; 
+
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  
+  /* Añadimos z-index para asegurar que flote por encima */
+  z-index: 1000; 
+}
+
+/* Cabecera del chat (el botón para toggle) */
+.chat-header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: #f1f1f1;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+}
+.chat-header-bottom h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #333;
+}
+.toggle-chat-btn {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  color: #555;
+  padding: 0.2em 0.5em;
+}
+
+/* Contenido del chat (mensajes e input) */
+.chat-content-bottom {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px; 
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out;
+}
+
+/* ESTADO MINIMIZADO */
+.chat-panel-bottom.minimized .chat-content-bottom {
+  max-height: 0;
+  visibility: hidden; 
+  padding: 0 1rem;
+}
+
+/* Estilos de Mensajes (reutilizados) */
+.chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #fff;
+}
+.message {
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  max-width: 85%;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+.message.bot {
+  background-color: #e9e9eb;
+  color: #222;
+  align-self: flex-start;
+}
+.message.user {
+  background-color: #C00;
+  color: #FFFFFF;
+  align-self: flex-end;
+}
+.chat-input-area {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f1f1f1;
+}
+.chat-input-area input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.6em 0.8em;
+  font-size: 1em;
+  margin-right: 0.5rem;
+}
+.chat-input-area button {
+  background-color: #4a4a4a;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.6em 1em;
+}
+.chat-input-area button:hover {
+  background-color: #333;
+}
