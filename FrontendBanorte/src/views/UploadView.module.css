@@ -40,6 +40,97 @@
   text-align: center;
 }
 
+/* --- AGREGA ESTAS CLASES a UploadView.module.css --- */
+
+/* Contenedor para los grupos de opciones */
+.optionGroup {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Estilo para las etiquetas (label) */
+.optionGroup label {
+  display: block;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+/* Estilo para el <select> */
+.optionGroup select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  background-color: #F8F9FA;
+  font-size: 1rem;
+  box-sizing: border-box; 
+  cursor: pointer;
+}
+
+.optionGroup select:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+/* Clase para deshabilitar el label de subida y el botón 'seleccionar' */
+.disabledLabel {
+  background-color: #e9ecef !important; /* !important para sobreescribir el hover */
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+/* Contenedor para el botón de Aceptar */
+.buttonGroup {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Estilo del botón de Aceptar */
+.btnAccept {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #EB0019; /* Color rojo Banorte */
+  color: white;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.btnAccept:hover {
+  background-color: #c90016; /* Un rojo más oscuro */
+  transform: translateY(-2px);
+}
+
+/* Estilo del botón Aceptar cuando está deshabilitado */
+.btnAccept:disabled {
+  background-color: #ced4da; /* Gris */
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Estilo para el mensaje de error */
+.errorInfo {
+  margin-top: 1rem;
+  font-size: 0.9em;
+  color: #c90016; /* Rojo */
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Estilo para el mensaje de éxito */
+.successInfo {
+  margin-top: 1rem;
+  font-size: 0.9em;
+  color: #007bff; /* Un azul/verde estaría bien */
+  font-weight: 500;
+  text-align: center;
+}
+
 /* --- ESTILOS DE LA NUEVA ZONA DE CARGA --- */
 
 .fileInputHidden {
