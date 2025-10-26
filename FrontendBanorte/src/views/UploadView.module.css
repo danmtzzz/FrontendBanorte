@@ -113,7 +113,7 @@
   justify-content: center;
   width: 100%;
   padding: 2.5rem;
-  border: 2px dashed #DEE2E6; /* Borde punteado */
+  border: 2px dashed #EB0019;
   border-radius: 8px;
   background-color: #F8F9FA;
   text-align: center;
@@ -150,8 +150,8 @@
 
 .selectButton {
   background-color: #FFFFFF;
-  color: #EB0019;
-  border: 1px solid #EB0019;
+  color: #212529;
+  border: 1px solid #212529;
   border-radius: 8px;
   padding: 0.6em 1.2em;
   font-size: 0.9em;

@@ -22,7 +22,8 @@
   display: flex;
   justify-content: center;
   gap: 2rem;
-  flex-wrap: wrap; /* <-- ¡LA CLAVE DE LA RESPONSIVIDAD! */
+  flex-wrap: wrap; 
+  align-items: stretch;
   width: 100%;
 }
 
@@ -47,7 +48,7 @@
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 10px #EB0019;
 }
 
 .card img {
