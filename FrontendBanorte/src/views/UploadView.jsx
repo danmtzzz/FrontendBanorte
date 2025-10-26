@@ -1,13 +1,14 @@
 // src/views/UploadView.jsx
 
-// 1. IMPORTACIONES NECESARIAS (limpiadas)
-import React, { useState, useRef } from 'react';
+// 1. IMPORTACIONES COMPLETAS (incluyendo axios)
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'; // Para el gráfico
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Para los íconos
-import { faChartSimple, faFileLines } from '@fortawesome/free-solid-svg-icons'; // Íconos
+import { faChartSimple, faFileLines } from '@fortawesome/free-solid-svg-icons'; // Íconos (restauramos faFileLines por si acaso)
 import styles from './UploadView.module.css'; // Tus estilos
+import axios from 'axios'; // Para la llamada real a la API
 
 // --- Ícono SVG (Sin cambios) ---
 const UploadIcon = () => (
@@ -28,59 +29,94 @@ const UploadIcon = () => (
 );
 // --- FIN del Ícono ---
 
-// --- DATOS DE EJEMPLO PARA EL GRÁFICO ---
-const datosDeEjemplo = [
-  { fecha: "Ene 23", Ahorro: 933131 }, { fecha: "Feb 23", Ahorro: 1825004 },
-  { fecha: "Mar 23", Ahorro: 2803839 }, { fecha: "Abr 23", Ahorro: 3609590 },
-  { fecha: "May 23", Ahorro: 4258505 }, { fecha: "Jun 23", Ahorro: 4987381 }
-];
-// ----------------------------------------
+// --- FUNCIÓN PARA FORMATEAR NÚMEROS GRANDES (K, M, B) (Sin cambios) ---
+const formatYAxisTick = (value) => {
+  if (value >= 1000000000) {
+    return `${(value / 1000000000).toFixed(1)}B`;
+  } else if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1)}M`;
+  } else if (value >= 1000) {
+    return `${(value / 1000).toFixed(0)}K`;
+  }
+  return value.toString();
+};
 
+// --- FUNCIÓN PARA TRANSFORMAR DATOS DE LA API (Sin cambios) ---
+const transformarDatosApi = (apiData) => {
+  if (!apiData || !apiData.initial_data || !apiData.initial_data.datos_historicos) {
+    console.error("Estructura de datos inesperada:", apiData);
+    return [];
+  }
+  const historico = apiData.initial_data.datos_historicos;
+  if (!historico.fechas || !historico.ahorro_acumulado || historico.fechas.length !== historico.ahorro_acumulado.length) {
+     console.error("Arrays de fechas y ahorro no coinciden:", historico);
+     return [];
+  }
+  return historico.fechas.map((fecha, index) => ({
+    fecha: new Date(fecha).toLocaleDateString('es-MX', { month: 'short', year: '2-digit' }),
+    "Ahorro Acumulado": historico.ahorro_acumulado[index]
+  }));
+};
+// -----------------------------------------------------------
 
-function UploadView({ setView }) { // Mantenemos setView por si necesitas volver al menu principal
+// === EL COMPONENTE PRINCIPAL ===
+function UploadView({ setView }) {
 
-  // --- ESTADOS ---
+  // --- ESTADOS (Sin cambios) ---
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [userType, setUserType] = useState('personal');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const fileInputRef = useRef(null);
-  // --- NUEVO ESTADO PARA CONTROLAR LA VISTA INTERNA ---
+  const [analysisResult, setAnalysisResult] = useState(null); // <-- Aquí se guarda el JSON de la API
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [showDashboardContent, setShowDashboardContent] = useState(false);
 
+  // --- REFS (Sin cambios) ---
+  const timeoutRef = useRef(null);
+  const isStillLoadingRef = useRef(false);
+  const fileInputRef = useRef(null);
 
-  // --- Lógica de Manejo de Archivos (Sin cambios) ---
+  // --- Limpieza de Timeouts (Sin cambios) ---
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      isStillLoadingRef.current = false;
+    };
+  }, []); // El [] vacío = se ejecuta al montar y desmontar
+
+
+  // --- Handlers (Sin cambios) ---
   const handleFile = (file) => {
+    if (analysisResult) setAnalysisResult(null);
+    if (showDashboardContent) setShowDashboardContent(false);
+
     if (file && (file.type === "application/vnd.ms-excel" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
       setSelectedFile(file);
       setError(null);
-      setSuccess(null);
+      setUploadProgress(0);
     } else {
       setSelectedFile(null);
       if (file) {
         setError("Por favor, selecciona solo archivos .xls o .xlsx");
       }
     }
-  };
-
+   };
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
       handleFile(event.target.files[0]);
     }
-  };
-
+   };
   const handleDragOver = (event) => {
     event.preventDefault();
     if (!loading) setIsDragging(true);
-  };
-
+   };
   const handleDragLeave = (event) => {
     event.preventDefault();
     setIsDragging(false);
-  };
-
+   };
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
@@ -90,65 +126,126 @@ function UploadView({ setView }) { // Mantenemos setView por si necesitas volver
       handleFile(event.dataTransfer.files[0]);
       event.dataTransfer.clearData();
     }
-  };
-
+   };
   const handleTypeChange = (event) => {
     setUserType(event.target.value);
-  };
+   };
 
-  // Botón Volver / Cargar otro
+  // Botón Volver / Cargar otro (Sin cambios)
   const handleReturn = () => {
     if (!loading) {
       if (showDashboardContent) {
-        setShowDashboardContent(false); // Vuelve a la vista de carga
-        setSelectedFile(null);       // Limpia el archivo
-        setSuccess(null);
-        setError(null); // Limpia errores también
+        // Si está mostrando el dashboard, resetea todo para volver a cargar
+        setShowDashboardContent(false);
+        setSelectedFile(null);
+        setAnalysisResult(null);
+        setError(null);
+        setUploadProgress(0);
         if (fileInputRef.current) {
           fileInputRef.current.value = null; // Resetea input
         }
       } else {
-        setView('main'); // Vuelve al menú principal (si vienes de ahí)
+        // Si está en la vista de carga, vuelve al menú principal
+        setView('main'); // Llama a la función del App.jsx
       }
     }
   };
 
-  // Botón Cancelar archivo seleccionado
+
+  // Botón Cancelar archivo seleccionado (Sin cambios)
   const handleCancelFile = () => {
     if (loading) return;
     setSelectedFile(null);
     setError(null);
-    setSuccess(null);
+    setUploadProgress(0);
     if (fileInputRef.current) {
       fileInputRef.current.value = null;
     }
   };
 
-  // Botón Aceptar y Analizar (AHORA MUESTRA EL DASHBOARD INTERNO)
-  const handleAccept = () => {
+
+  // --- LÓGICA DE SUBIDA Y ANÁLISIS (CON LLAMADA A API RESTAURADA) ---
+  const handleAccept = async () => {
     if (!selectedFile) {
-      setError('Por favor, selecciona un archivo primero.');
-      return;
+        setError('Por favor, selecciona un archivo primero.');
+        return;
     }
 
     setLoading(true);
     setError(null);
-    setSuccess(null);
+    setAnalysisResult(null); // Limpia resultado anterior
+    setUploadProgress(0);
+    isStillLoadingRef.current = true;
 
-    // Simula el procesamiento del archivo
-    setTimeout(() => {
-      setLoading(false);
-      // setSuccess('¡Archivo procesado!'); // Mensaje opcional
-      setShowDashboardContent(true); // <-- MUESTRA EL DASHBOARD
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    }, 1500); // Simula 1.5 segundos
+    // Simulación de progreso (sin cambios)
+    const simulateProgress = () => {
+      if (!isStillLoadingRef.current) return;
+      const randomIncrement = Math.random() * 10 + 5;
+      const randomDelay = Math.random() * 800 + 200;
+      setUploadProgress(prev => {
+        let newProgress = prev + randomIncrement;
+        if (newProgress >= 98) { // Se detiene cerca del final
+          return 98;
+        } else {
+          timeoutRef.current = setTimeout(simulateProgress, randomDelay);
+          return newProgress;
+        }
+      });
+    };
+    setUploadProgress(1); // Inicio visual inmediato
+    timeoutRef.current = setTimeout(simulateProgress, 300 + Math.random() * 500);
+
+    // Petición REAL a la API
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    // **Asegúrate de que esta URL sea correcta**
+    const backendUrl = `http://127.0.0.1:8000/upload/?tipo_usuario=${userType}`;
+    const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+    try {
+        // --- LLAMADA A AXIOS ---
+        const response = await axios.post(backendUrl, formData, config);
+        // --- FIN LLAMADA ---
+
+        isStillLoadingRef.current = false; // Detiene simulación
+        clearTimeout(timeoutRef.current); // Limpia timeout
+        setUploadProgress(100); // Marca 100%
+
+        // Pequeña pausa para que se vea el 100%
+        setTimeout(() => {
+          console.log('Respuesta del backend:', response.data);
+          setAnalysisResult(response.data); // Guarda la respuesta de la API
+          setShowDashboardContent(true);    // Muestra el dashboard
+          setLoading(false);              // Termina estado de carga
+          // No limpiamos selectedFile aquí, se limpia al cargar otro
+        }, 300);
+
+    } catch (err) {
+        // --- MANEJO DE ERROR ---
+        isStillLoadingRef.current = false; // Detiene simulación
+        clearTimeout(timeoutRef.current); // Limpia timeout
+        console.error('Error al subir el archivo:', err);
+        // Mensaje de error más específico si es posible
+        if (err.response) {
+            // Error desde el servidor (ej. 4xx, 5xx)
+            setError(`Error del servidor: ${err.response.data.detail || err.response.statusText}`);
+        } else if (err.request) {
+            // No hubo respuesta (servidor caído o URL mal)
+            setError('No se pudo conectar con el servidor. ¿Está encendido?');
+        } else {
+            // Otro error (ej. configuración de axios)
+            setError('Ocurrió un error inesperado al preparar la solicitud.');
+        }
+        setLoading(false);              // Termina estado de carga
+        setUploadProgress(0);           // Resetea barra
+    }
   };
+  // --- FIN LÓGICA DE SUBIDA ---
 
-  // (Opcional) Función para el botón "Generar Reporte" del dashboard interno
-  const handleGenerarReporte = () => {
-      console.log("Generando reporte...");
-      // Aquí iría la lógica
-  };
+  // Función para el botón "Generar Reporte" (si decides re-añadirlo)
+  // const handleGenerarReporte = () => { console.log("Generando reporte...")};
 
 
   // --- RENDERIZADO ---
@@ -162,52 +259,59 @@ function UploadView({ setView }) { // Mantenemos setView por si necesitas volver
         onClick={handleReturn}
         disabled={loading}
       >
-        {/* Usamos el símbolo de flecha unicode */}
         {showDashboardContent ? '← Cargar otro archivo' : '← Volver al Menú'}
       </button>
 
       {/* --- RENDERIZADO CONDICIONAL: DASHBOARD O UPLOAD --- */}
-      {showDashboardContent ? (
-
-        /* --- CONTENIDO DEL DASHBOARD --- */
+      {showDashboardContent && analysisResult ? (
+        /* --- A. CONTENIDO DEL DASHBOARD --- */
         <>
           {/* Título del Dashboard */}
-          <h2 className={styles.dashboardTitle}>Estadísticas Generales</h2>
+          <h2 className={styles.dashboardTitle}>{analysisResult.message || "Estadísticas Generales"}</h2>
 
           {/* Tarjeta del Gráfico */}
-          <div className={styles.chartCard}>
-            {loading ? ( // Mantenemos el loader por si acaso
-              <p className={styles.loadingText}>Cargando gráfico...</p>
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={datosDeEjemplo} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="fecha" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="Ahorro" stroke="#007bff" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
+          <div className={styles.chartCardLarge}>
+            {(() => {
+                const chartData = transformarDatosApi(analysisResult); // Procesa los datos de la API
+                if (chartData.length > 0) {
+                  return (
+                    <ResponsiveContainer width="100%" height={400}>
+                      <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="fecha" />
+                        <YAxis tickFormatter={formatYAxisTick} />
+                        <Tooltip formatter={(value) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)} />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="Ahorro Acumulado"
+                          stroke="#EB0019" // Rojo
+                          strokeWidth={2}
+                          dot={false}
+                          activeDot={{ r: 6 }}
+                         />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  );
+                } else {
+                  return <p className={styles.loadingText}>No se encontraron datos históricos para graficar en el archivo.</p>;
+                }
+            })()}
           </div>
 
-          {/* Botones de Acción del Dashboard */}
+          {/* Botón de Acción Único */}
           <div className={styles.actionsContainer}>
-            <button className={styles.actionButton}>
+             <button className={styles.actionButton}>
               <FontAwesomeIcon icon={faChartSimple} />
               <span>Estadísticas Detalladas</span>
             </button>
-            <button className={styles.actionButton} onClick={handleGenerarReporte}>
-              <FontAwesomeIcon icon={faFileLines} />
-              <span>Generar Nuevo Reporte</span>
-            </button>
+             {/* El otro botón fue eliminado */}
           </div>
         </>
         /* --- FIN DEL DASHBOARD --- */
 
       ) : (
-
-        /* --- CONTENIDO DE UPLOAD (Tu código original) --- */
+        /* --- B. CONTENIDO DE UPLOAD --- */
         <>
           <h2>Cargar archivo de Excel</h2>
           <p>Arrastra tu archivo .xls o .xlsx aquí para analizarlo.</p>
@@ -244,7 +348,7 @@ function UploadView({ setView }) { // Mantenemos setView por si necesitas volver
               accept=".xlsx, .xls"
               onChange={handleFileChange}
               disabled={loading}
-              ref={fileInputRef} // <-- La ref sigue aquí
+              ref={fileInputRef}
             />
             <UploadIcon />
             <p className={styles.uploadText}>Arrastra y suelta tu archivo aquí</p>
@@ -262,7 +366,7 @@ function UploadView({ setView }) { // Mantenemos setView por si necesitas volver
 
           {/* Mensajes de Estado */}
           {error && <p className={styles.errorInfo}>{error}</p>}
-          {success && <p className={styles.successInfo}>{success}</p>}
+          {/* El mensaje de success ya no es necesario aquí */}
 
           {/* Contenedor del Archivo Seleccionado y Cancelar */}
           {selectedFile && !error && (
@@ -285,9 +389,21 @@ function UploadView({ setView }) { // Mantenemos setView por si necesitas volver
             <button
               className={styles.btnAccept}
               onClick={handleAccept}
-              disabled={!selectedFile || loading}
+              disabled={!selectedFile || loading} // Deshabilitado si no hay archivo o si está cargando
             >
-              {loading ? 'Cargando...' : 'Aceptar y Analizar'}
+              {/* Barra de progreso */}
+              {loading && (
+                <div
+                  className={styles.progressBar}
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              )}
+              {/* Texto del botón */}
+              <span className={styles.progressText}>
+                {loading
+                  ? `Procesando... ${Math.round(uploadProgress)}%` // Muestra progreso
+                  : 'Aceptar y Analizar'}
+              </span>
             </button>
           </div>
         </>
