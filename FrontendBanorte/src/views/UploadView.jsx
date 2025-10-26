@@ -7,7 +7,7 @@ const UploadIcon = () => (
   <svg 
     className={styles.uploadIcon}
     xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24" 
+    viewBox="0 0 24 24" 
     fill="none" 
     stroke="currentColor" 
     strokeWidth="2" 
@@ -27,22 +27,16 @@ function UploadView({ setView }) {
   // --- ESTADOS ---
   const [selectedFile, setSelectedFile] = useState(null); 
   const [isDragging, setIsDragging] = useState(false);
-  const [userType, setUserType] = useState('personal');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   // --- REFS ---
-  // Usamos un ref para el ID del timeout
   const timeoutRef = useRef(null);
-  // Y un ref para saber si la simulación debe seguir corriendo
-  // Esto es para que los timeouts "viejos" no actualicen el estado
-  // si la carga ya terminó (por éxito o error).
   const isStillLoadingRef = useRef(false);
 
   // --- Limpieza ---
-  // Limpia cualquier timeout pendiente si el componente se desmonta
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -50,10 +44,10 @@ function UploadView({ setView }) {
       }
       isStillLoadingRef.current = false;
     };
-  }, []); // El [] vacío = se ejecuta al montar y desmontar
+  }, []); 
 
 
-  // --- (Handlers de archivo, drag/drop, etc. se quedan igual) ---
+  // --- (Handlers de archivo, drag/drop, etc.) ---
   const handleFile = (file) => {
     if (analysisResult) setAnalysisResult(null);
     if (file && (file.type === "application/vnd.ms-excel" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
@@ -89,9 +83,9 @@ function UploadView({ setView }) {
       event.dataTransfer.clearData();
     }
   };
-  const handleTypeChange = (event) => {
-    setUserType(event.target.value);
-  };
+  
+  // const handleTypeChange = (event) => { ... }; // <-- ELIMINADO
+
   const handleReturnToMain = () => {
     if (loading) return; 
     setView('main');
@@ -104,7 +98,7 @@ function UploadView({ setView }) {
   };
 
 
-  // --- ¡NUEVA LÓGICA DE SUBIDA CON SIMULACIÓN ALEATORIA! ---
+  // --- LÓGICA DE SUBIDA (SIMULACIÓN ALEATORIA) ---
   const handleAccept = async () => {
     if (!selectedFile) {
         setError('Por favor, selecciona un archivo primero.');
@@ -115,57 +109,48 @@ function UploadView({ setView }) {
     setError(null);
     setAnalysisResult(null);
     setUploadProgress(0); 
-    isStillLoadingRef.current = true; // <-- Marcamos que la carga inició
+    isStillLoadingRef.current = true; 
 
-    // Limpiamos cualquier timeout viejo
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    // --- Inicia la SIMULACIÓN de progreso ---
-    // Esta función se llamará a sí misma en cadena
+    // --- (Función de simulación se queda igual) ---
     const simulateProgress = () => {
-      // Si la carga terminó (por éxito o error), detenemos la simulación
       if (!isStillLoadingRef.current) return;
-
-      // Calculamos un salto aleatorio (ej. entre 1% y 15%)
-      const randomIncrement = Math.random() * 10 + 1;
-      // Calculamos un tiempo de espera aleatorio (ej. entre 500ms y 2s)
-      const randomDelay = Math.random() * 2000 + 1000;
+      const randomIncrement = Math.random() * 14 + 1;
+      const randomDelay = Math.random() * 4000 + 1000;
 
       setUploadProgress(prev => {
         let newProgress = prev + randomIncrement;
-        
         if (newProgress >= 98) {
-          // Si llegamos a 98%, nos "atoramos" ahí y dejamos de simular
           return 98; 
         } else {
-          // Si no, programamos el siguiente salto
           timeoutRef.current = setTimeout(simulateProgress, randomDelay);
           return newProgress;
         }
       });
     };
-
-    // --- Arrancamos la simulación ---
-    // Damos un pequeño salto inicial para que se vea que empezó
     setUploadProgress(1); 
-    // Programamos el primer salto aleatorio
-    timeoutRef.current = setTimeout(simulateProgress, 500 + Math.random() * 1000); // Espera inicial
+    timeoutRef.current = setTimeout(simulateProgress, 500 + Math.random() * 1000); 
     
-    // --- Petición REAL a la API (mientras la simulación corre) ---
+    // --- Petición REAL a la API ---
     const formData = new FormData();
     formData.append('file', selectedFile);
-    const backendUrl = `http://127.0.0.1:8000/upload/?tipo_usuario=${userType}`;
+    
+    // --- ¡URL ACTUALIZADA! ---
+    // Ya no se envía el parámetro 'tipo_usuario'
+    const backendUrl = `http://127.0.0.1:8000/upload/`; 
+    
     const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
     try {
         const response = await axios.post(backendUrl, formData, config);
         
         // --- ¡ÉXITO! ---
-        isStillLoadingRef.current = false; // <-- Detenemos la simulación
-        clearTimeout(timeoutRef.current);  // Matamos el último timeout
-        setUploadProgress(100); // Saltamos a 100%
+        isStillLoadingRef.current = false; 
+        clearTimeout(timeoutRef.current);  
+        setUploadProgress(100); 
 
-        setTimeout(() => { // Pausa para que se vea el 100%
+        setTimeout(() => { 
           console.log('Respuesta del backend:', response.data);
           setAnalysisResult(response.data); 
           setLoading(false); 
@@ -174,19 +159,20 @@ function UploadView({ setView }) {
 
     } catch (err) {
         // --- ¡ERROR! ---
-        isStillLoadingRef.current = false; // <-- Detenemos la simulación
-        clearTimeout(timeoutRef.current);  // Matamos el último timeout
+        isStillLoadingRef.current = false; 
+        clearTimeout(timeoutRef.current);  
         console.error('Error al subir el archivo:', err);
         setError('Hubo un error al subir el archivo. Revisa la consola.');
         setLoading(false); 
-        setUploadProgress(0); // Reseteamos la barra
+        setUploadProgress(0); 
     }
   };
 
 
-  // --- RENDERIZADO (El JSX no cambia nada) ---
+  // --- RENDERIZADO CONDICIONAL ---
 
   // 1. VISTA DE RESULTADO (JSON)
+  // (Esta parte se queda exactamente igual)
   if (analysisResult) {
     return (
       <div className={styles.uploadViewContainer}>
@@ -227,19 +213,10 @@ function UploadView({ setView }) {
       <h2>Cargar archivo de Excel</h2>
       <p>Arrastra tu archivo .xls o .xlsx aquí para analizarlo.</p>
       
-      {/* Selector de Tipo de Cuenta */}
-      <div className={styles.optionGroup}>
-          <label htmlFor="user-type-select">Tipo de Cuenta:</label>
-          <select 
-              id="user-type-select" 
-              value={userType} 
-              onChange={handleTypeChange}
-              disabled={loading}
-          >
-              <option value="personal">Finanzas Personales</option>
-              <option value="pyme">Finanzas PYME</option>
-          </select>
-      </div>
+      {/* --- ELIMINADO ---
+        Ya no existe el <div className={styles.optionGroup}>
+        con el <select> de tipo de cuenta.
+      */}
 
       {/* Zona de "Drag and Drop" */}
       <div 
@@ -304,7 +281,7 @@ function UploadView({ setView }) {
             )}
             <span className={styles.progressText}>
               {loading 
-                ? `Procesando... ${Math.round(uploadProgress)}%` // Redondeamos para que no muestre decimales
+                ? `Procesando... ${Math.round(uploadProgress)}%` 
                 : 'Aceptar y Analizar'}
             </span>
           </button>

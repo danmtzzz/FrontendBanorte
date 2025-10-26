@@ -52,7 +52,7 @@
 
 .card img {
   height: 4.5em;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .card p {
@@ -76,8 +76,8 @@
 }
 
 .ctaButton:hover {
-  background-color: #AD0013;
-  transform: translateY(-2px);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(235, 0, 25, 0.25);
 }
 
 /* Media Query para teléfonos */

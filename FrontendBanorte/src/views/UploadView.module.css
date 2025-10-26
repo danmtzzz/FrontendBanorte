@@ -40,40 +40,6 @@
   text-align: center;
 }
 
-/* --- AGREGA ESTAS CLASES a UploadView.module.css --- */
-
-/* Contenedor para los grupos de opciones */
-.optionGroup {
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
-
-/* Estilo para las etiquetas (label) */
-.optionGroup label {
-  display: block;
-  font-weight: 500;
-  color: #495057;
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-/* Estilo para el <select> */
-.optionGroup select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #DEE2E6;
-  border-radius: 8px;
-  background-color: #F8F9FA;
-  font-size: 1rem;
-  box-sizing: border-box; 
-  cursor: pointer;
-}
-
-.optionGroup select:disabled {
-  background-color: #e9ecef;
-  cursor: not-allowed;
-}
-
 /* Clase para deshabilitar el label de subida y el botón 'seleccionar' */
 .disabledLabel {
   background-color: #e9ecef !important; /* !important para sobreescribir el hover */
