@@ -19,6 +19,7 @@
   font-size: 1rem;
   margin-bottom: 1.5rem;
   padding: 0;
+  transition: color 0.2s;
 }
 .backButton:hover {
   color: #EB0019;
@@ -29,40 +30,85 @@
   font-size: 2rem;
   margin-top: 0;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .uploadViewContainer p {
   color: #6C757D;
   font-size: 1.1rem;
   margin-bottom: 2rem;
+  text-align: center;
 }
+
+/* --- ESTILOS DE LA NUEVA ZONA DE CARGA --- */
 
 .fileInputHidden {
   display: none; /* Oculta el input feo */
 }
 
-.fileUploadLabel {
-  display: block;
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 3rem 1rem;
-  border: 2px dashed #DEE2E6;
+  padding: 2.5rem;
+  border: 2px dashed #DEE2E6; /* Borde punteado */
   border-radius: 8px;
   background-color: #F8F9FA;
   text-align: center;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s;
-  font-weight: 500;
-  color: #495057;
+  box-sizing: border-box;
 }
 
-.fileUploadLabel:hover {
+/* Estilo al arrastrar un archivo sobre la zona */
+.dropZone.dragOver {
   border-color: #EB0019;
-  background-color: #fff8f8;
+  background-color: #fff8f8; /* Tono rojo muy claro */
+}
+
+.uploadIcon {
+  width: 60px;
+  height: 60px;
+  color: #EB0019; /* Color rojo Banorte */
+  margin-bottom: 1rem;
+}
+
+.uploadText {
+  font-size: 1.1em !important;
+  font-weight: 600;
+  color: #333 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.uploadSubtext {
+  color: #6C757D !important;
+  margin-bottom: 1rem !important;
+  font-size: 0.9em !important;
+}
+
+.selectButton {
+  background-color: #FFFFFF;
+  color: #EB0019;
+  border: 1px solid #EB0019;
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.selectButton:hover {
+  background-color: #EB0019;
+  color: #FFFFFF;
 }
 
 .fileNameDisplay {
   margin-top: 1.5rem;
-  font-size: 0.9em;
-  color: #6C757D;
+  font-size: 1em;
+  color: #28a745; /* Verde para éxito */
   text-align: center;
+  font-weight: 500;
 }
