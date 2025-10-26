@@ -1,22 +1,17 @@
-import React, { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-import ReactDOM from 'react-dom/client';
+// main.jsx (Corregido y Limpio)
 
+import React, { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client'; // Solo necesitas importar ReactDOM
+import './index.css';
+import App from './App.jsx';
 
+// Ya no necesitas BrowserRouter si no vas a usar rutas
+// import { BrowserRouter } from 'react-router-dom';
 
- 
-import { BrowserRouter } from 'react-router-dom';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <React.StrictMode>
-    {/*<App /> */}
-    <BrowserRouter>
-      <App/>
-    </BrowserRouter>
-    
-    {/*<AppRoutingFinal/>*/}
-  </React.StrictMode>
+  <StrictMode>
+    <App />
+  </StrictMode>
 );

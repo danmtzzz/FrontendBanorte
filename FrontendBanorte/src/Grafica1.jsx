@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 // 1. Importa tu archivo JSON
-import jsonData from '../data/miRespuesta.json';
+import jsonData from './response_1761446019778.json';
 
 // --- 2. TRANSFORMACIÓN DE DATOS ---
 // Recharts no puede leer dos arrays separados.
