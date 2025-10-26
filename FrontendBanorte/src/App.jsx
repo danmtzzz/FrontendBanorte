@@ -8,11 +8,18 @@ function App() {
 
   return (
     <div>
-    <Routes>
-      <Route path="/" element={<LogIn></LogIn>}></Route>
-      <Route path="/Dashboard" element={<Dashboard/>}></Route>
-    </Routes>
-      
+      <div className="dash-background">
+      <div className="dash-container">
+        
+        <h1>Datos Históricos</h1>
+        <div className="chart-card">
+          <GraficoHistorico />
+        </div>
+
+        <h1>Gastos Actuales</h1>
+        <div className="chart-card">
+          <GraficoGastos />
+        </div>
     </div>
   )
 }
